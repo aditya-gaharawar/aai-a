@@ -22,21 +22,34 @@ const App: React.FC = () => {
     };
 
     const handleLinkClick = (event: MouseEvent) => {
-        let target = event.target as HTMLElement;
-        const anchor = target.closest('a');
+      if (event.defaultPrevented) return;
 
-        // Handle internal navigation for SPA-like experience
-        if (anchor && anchor.target !== '_blank' && anchor.href && anchor.origin === window.location.origin) {
-            const path = anchor.pathname;
-            if(path !== window.location.pathname) {
-                event.preventDefault();
-                window.history.pushState({}, '', path);
-                onLocationChange();
-                window.scrollTo(0, 0); // Scroll to top on page change
-            }
-        }
+      // Respect browser behaviors such as opening in new tab/window.
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const target = event.target as HTMLElement;
+      const anchor = target.closest('a');
+      if (!anchor) return;
+
+      const isSameOrigin = anchor.origin === window.location.origin;
+      const hasSpecialAttrs = anchor.target === '_blank' || anchor.hasAttribute('download') || anchor.getAttribute('rel') === 'external';
+
+      // Handle internal navigation for SPA-like experience.
+      if (!isSameOrigin || hasSpecialAttrs) return;
+
+      const nextUrl = `${anchor.pathname}${anchor.search}${anchor.hash}`;
+      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+      if (nextUrl === currentUrl) return;
+
+      event.preventDefault();
+      window.history.pushState({}, '', nextUrl);
+      onLocationChange();
+      window.scrollTo(0, 0);
     };
-    
+
     window.addEventListener('popstate', onLocationChange);
     document.addEventListener('click', handleLinkClick);
 
@@ -61,7 +74,7 @@ const App: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-[#050505] text-gray-900 dark:text-gray-200 min-h-screen selection:bg-black/10 dark:selection:bg-white/20 transition-colors duration-300">
-      <Header 
+      <Header
         theme={theme}
         toggleTheme={toggleTheme}
       />

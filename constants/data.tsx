@@ -1,8 +1,5 @@
 import React from 'react';
 import { CardData, FooterLinkColumn } from '../types';
-import image1 from '../src/assets/images/image1.png';
-import image2 from '../src/assets/images/image2.png';
-import image3 from '../src/assets/images/image3.png';
 import geminiGenerated from '../src/assets/images/gemini_generated.jpg';
 import image4 from '../src/assets/images/image4.jpeg';
 
@@ -10,19 +7,19 @@ export const heroSlides = [
   {
     title: 'Spring Update',
     description: 'Introducing GPT-4o and making more capabilities available for free in our Product.',
-    imageUrl: image1,
+    imageUrl: 'https://picsum.photos/seed/spring-update/1400/800',
     buttonText: 'Learn more',
   },
   {
     title: 'Explore Our Research',
     description: 'Advancing AI to benefit all of humanity.',
-    imageUrl: image2,
+    imageUrl: 'https://picsum.photos/seed/research/1400/800',
     buttonText: 'See publications',
   },
   {
     title: 'AI for Business',
     description: 'Deploy the world\'s most capable models in your own applications.',
-    imageUrl: image3,
+    imageUrl: 'https://picsum.photos/seed/business/1400/800',
     buttonText: 'Discover our APIs',
   },
   {

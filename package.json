@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "tsc -b --pretty false",
+    "test": "npm run lint"
   },
   "dependencies": {
     "react": "^18.3.1",

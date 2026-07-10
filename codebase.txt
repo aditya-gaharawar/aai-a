@@ -1,0 +1,1428 @@
+
+--- START OF FILE index.tsx ---
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+--- END OF FILE index.tsx ---
+
+--- START OF FILE metadata.json ---
+{
+  "name": "WEBSPACEAI Homepage",
+  "description": "A modern, responsive homepage for WEBSPACEAI, an AI research and product company, showcasing updates, research, business solutions, and developer tools.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
+--- END OF FILE metadata.json ---
+
+--- START OF FILE index.html ---
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WEBSPACEAI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/"
+  }
+}
+</script>
+<style>
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #1f2937;
+    --border-color: #e5e7eb;
+  }
+  .dark {
+    --bg-color: #050505;
+    --text-color: #e5e7eb;
+    --border-color: #374151;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: #000;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #333;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  /* Ken Burns Effect */
+  @keyframes ken-burns {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+    100% {
+      transform: scale(1.1) translate(-1%, -1%);
+    }
+  }
+  .animate-ken-burns {
+    animation: ken-burns 20s ease-in-out infinite alternate;
+  }
+
+  /* Custom Ordered List for Safety Page */
+  .custom-ol {
+    list-style: none;
+    counter-reset: custom-counter;
+    padding-left: 0;
+  }
+  .custom-ol li {
+    counter-increment: custom-counter;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 50px;
+  }
+  .custom-ol li::before {
+    content: counter(custom-counter, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    top: -2px;
+  }
+  .dark .custom-ol li::before {
+    color: #6b7280;
+    background-color: #1f2937;
+  }
+</style>
+</head>
+  <body class="bg-white dark:bg-[#050505]">
+    <div id="root"></div>
+  </body>
+</html>
+--- END OF FILE index.html ---
+
+--- START OF FILE App.tsx ---
+import React, { useState, useEffect } from 'react';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
+import HomePage from './pages/HomePage';
+import SafetyPage from './pages/SafetyPage';
+
+const App: React.FC = () => {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    const onLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    const handleLinkClick = (event: MouseEvent) => {
+        let target = event.target as HTMLElement;
+        const anchor = target.closest('a');
+
+        // Handle internal navigation for SPA-like experience
+        if (anchor && anchor.target !== '_blank' && anchor.href && anchor.origin === window.location.origin) {
+            const path = anchor.pathname;
+            if(path !== window.location.pathname) {
+                event.preventDefault();
+                window.history.pushState({}, '', path);
+                onLocationChange();
+                window.scrollTo(0, 0); // Scroll to top on page change
+            }
+        }
+    };
+    
+    window.addEventListener('popstate', onLocationChange);
+    document.addEventListener('click', handleLinkClick);
+
+    return () => {
+      window.removeEventListener('popstate', onLocationChange);
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, []);
+
+  const renderPage = () => {
+    switch (currentPath) {
+      case '/safety':
+        return <SafetyPage />;
+      default:
+        return <HomePage />;
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  return (
+    <div className="bg-white dark:bg-[#050505] text-gray-900 dark:text-gray-200 min-h-screen selection:bg-black/10 dark:selection:bg-white/20 transition-colors duration-300">
+      <Header 
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
+      {renderPage()}
+      <Footer />
+    </div>
+  );
+};
+
+export default App;
+--- END OF FILE App.tsx ---
+
+--- START OF FILE types.ts ---
+import React from 'react';
+
+export interface CardData {
+  category?: string;
+  date?: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  bgColor?: string;
+  textColor?: string;
+  logo?: React.ReactNode;
+  codeSnippet?: {
+    lang: string;
+    code: string;
+  };
+  linkText?: string;
+  fullSpan?: boolean;
+}
+
+export interface FooterLinkColumn {
+    title: string;
+    links: { text: string; href: string; external?: boolean }[];
+}
+--- END OF FILE types.ts ---
+
+--- START OF FILE components/icons.tsx ---
+import React from 'react';
+
+export const LogoIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <img src="https://cdn1.webspaceai.in/eef565e3-c66a-41ac-9aed-23821bf1e2a8.png" alt="WEBSPACEAI Logo" className={className} />
+);
+
+export const MenuIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <line x1="4" y1="8" x2="20" y2="8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <line x1="4" y1="16" x2="20" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 6 6 18"/>
+    <path d="m6 6 12 12"/>
+  </svg>
+);
+
+export const ArrowRightIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const SunIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2"/>
+    <path d="M12 20v2"/>
+    <path d="m4.93 4.93 1.41 1.41"/>
+    <path d="m17.66 17.66 1.41 1.41"/>
+    <path d="M2 12h2"/>
+    <path d="M20 12h2"/>
+    <path d="m6.34 17.66-1.41 1.41"/>
+    <path d="m19.07 4.93-1.41 1.41"/>
+  </svg>
+);
+
+export const MoonIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+  </svg>
+);
+
+export const StoryIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg width="64" height="64" viewBox="0 0 82 50" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <path d="M40.9999 50C40.9999 46.6667 39.4999 41.5 35.4999 38C31.4999 34.5 25.6666 32.6667 21.4999 31.5C17.3332 30.3333 11.8332 29.5 7.99988 29C4.16654 28.5 0.499878 27.8333 0.499878 25C0.499878 22.1667 4.16654 21.5 7.99988 21C11.8332 20.5 17.3332 19.6667 21.4999 18.5C25.6666 17.3333 31.4999 15.5 35.4999 12C39.4999 8.5 40.9999 3.33333 40.9999 0" stroke="currentColor" strokeWidth="2"></path>
+        <path d="M41 50C41 46.6667 42.5 41.5 46.5 38C50.5 34.5 56.3333 32.6667 60.5 31.5C64.6667 30.3333 70.1667 29.5 74 29C77.8333 28.5 81.5 27.8333 81.5 25C81.5 22.1667 77.8333 21.5 74 21C70.1667 20.5 64.6667 19.6667 60.5 18.5C56.3333 17.3333 50.5 15.5 46.5 12C42.5 8.5 41 3.33333 41 0" stroke="currentColor" strokeWidth="2"></path>
+    </svg>
+);
+
+export const ModernaLogo: React.FC<{ className?: string }> = ({ className }) => (
+    <div className={`flex flex-col items-center justify-center text-white ${className}`}>
+        <span className="text-4xl font-light tracking-[0.2em]">moderna</span>
+        <span className="text-xl font-light tracking-[0.6em]">---------</span>
+    </div>
+);
+
+const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+    {children}
+  </a>
+);
+
+export const SocialIcons: React.FC = () => (
+  <div className="flex items-center space-x-6">
+    <SocialIcon href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </SocialIcon>
+    <SocialIcon href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+    </SocialIcon>
+    <SocialIcon href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+    </SocialIcon>
+    <SocialIcon href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17Z"/><path d="m10 15 5-3-5-3z"/></svg>
+    </SocialIcon>
+  </div>
+);
+
+export const ChevronDownIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="m6 9 6 6 6-6"/>
+    </svg>
+);
+
+// Icons for Safety Page Core Principles
+export const CapabilityRiskIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3v18M3 6h18M3 18h18M4 6l8 6 8-6M4 18l8-6 8 6"/>
+    </svg>
+);
+export const ThresholdsIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+    </svg>
+);
+export const SafeguardsIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+);
+export const EvaluationIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+);
+export const GovernanceIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m13 2-3 3 3 3 3-3-3-3zM6 8l-4 4 4 4 4-4-4-4zM13 19l-3 3 3 3 3-3-3-3zM18 8l4 4-4 4-4-4 4-4z"/>
+    </svg>
+);
+export const MonitoringIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+);
+export const ReportingIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+    </svg>
+);
+export const ResearchIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5V4A2.5 2.5 0 0 1 6.5 2z"/>
+    </svg>
+);
+--- END OF FILE components/icons.tsx ---
+
+--- START OF FILE constants/data.tsx ---
+import React from 'react';
+import { CardData, FooterLinkColumn } from '../types';
+
+export const heroSlides = [
+  {
+    title: 'Spring Update',
+    description: 'Introducing GPT-4o and making more capabilities available for free in our Product.',
+    imageUrl: 'https://cdn1.webspaceai.in/76e5999d-71c2-40df-911f-90b943b0a3b1.png',
+    buttonText: 'Learn more',
+  },
+  {
+    title: 'Explore Our Research',
+    description: 'Advancing AI to benefit all of humanity.',
+    imageUrl: 'https://cdn1.webspaceai.in/d9f35bf7-3a1d-424b-b38f-491c2df1a522.png',
+    buttonText: 'See publications',
+  },
+  {
+    title: 'AI for Business',
+    description: 'Deploy the world\'s most capable models in your own applications.',
+    imageUrl: 'https://cdn1.webspaceai.in/90fe8a4f-afd9-4333-a1a4-ae82d3c8ee9a.png',
+    buttonText: 'Discover our APIs',
+  },
+  {
+    title: 'Join Our Team',
+    description: 'Help us build the future of artificial intelligence.',
+    imageUrl: 'https://picsum.photos/seed/team/1200/600',
+    buttonText: 'View careers',
+  },
+];
+
+export const productCards: CardData[] = [
+  {
+    category: 'For Everyone',
+    title: 'WEBSPACEAI',
+    imageUrl: 'https://cdn1.webspaceai.in/Gemini_Generated_Image_vui5rqvui5rqvui5_znfu0x_c_fill_w_1024_h_1024_jl3cz5.jpg',
+  },
+  {
+    category: 'For Everyone',
+    title: 'ONE',
+    imageUrl: 'https://cdn1.webspaceai.in/467028089_550858827878595_1920798175618811742_n.jpeg',
+  },
+];
+
+export const researchCards: CardData[] = [
+  {
+    category: 'GPT-4o',
+    date: 'May 13, 2024',
+    title: 'Hello GPT-4o',
+    imageUrl: 'https://picsum.photos/seed/gpt4o/600/800',
+  },
+  {
+    category: 'Sora',
+    title: 'Video generation models as world simulators',
+    imageUrl: 'https://picsum.photos/seed/sora/600/800',
+  },
+  {
+    category: 'Safety',
+    date: 'Dec 18, 2023',
+    title: 'Weak-to-strong generalization in LLMs',
+    imageUrl: 'https://picsum.photos/seed/safety_research/600/800',
+  },
+  {
+    category: 'Multi-modal',
+    date: 'Oct 25, 2023',
+    title: 'Unified reasoning across text and vision',
+    imageUrl: 'https://picsum.photos/seed/multimodal/600/800',
+  },
+];
+
+export const newsCards: CardData[] = [
+  {
+    category: 'Company',
+    date: 'Jun 10, 2024',
+    title: 'WEBSPACEAI and Apple announce partnership',
+    imageUrl: 'https://picsum.photos/seed/apple/600/600',
+  },
+  {
+    category: 'Company',
+    date: 'May 8, 2024',
+    title: 'Introducing the Model Spec',
+    imageUrl: 'https://picsum.photos/seed/modelspec/600/600',
+  },
+];
+
+export const menuLinks: FooterLinkColumn[] = [
+    {
+        title: "Research",
+        links: [
+            { text: "Overview", href: "#" },
+            { text: "Index", href: "#" },
+            { text: "GPT-4o", href: "#" },
+            { text: "Sora", href: "#" },
+        ],
+    },
+    {
+        title: "Products",
+        links: [
+            { text: "Our Product", href: "#" },
+            { text: "API", href: "#" },
+            { text: "Pricing", href: "#" },
+            { text: "For Business", href: "#" },
+        ],
+    },
+    {
+        title: "Company",
+        links: [
+            { text: "About us", href: "#" },
+            { text: "News", href: "#" },
+            { text: "Careers", href: "#" },
+            { text: "Security", href: "#" },
+        ],
+    },
+    {
+      title: "Safety",
+      links: [
+          { text: "Safety Framework", href: "/safety" },
+          { text: "Safety Standards", href: "#" },
+      ],
+  }
+];
+
+export const footerLinks: FooterLinkColumn[] = [
+    {
+        title: "Research",
+        links: [
+            { text: "Overview", href: "#" },
+            { text: "Index", href: "#" },
+            { text: "Latest advancements", href: "#" },
+            { text: "GPT-4", href: "#" },
+            { text: "DALL·E 3", href: "#" },
+            { text: "Sora", href: "#" },
+        ],
+    },
+    {
+        title: "Product",
+        links: [
+            { text: "For Everyone", href: "#" },
+            { text: "For Teams", href: "#" },
+            { text: "For Enterprises", href: "#" },
+            { text: "Product login", href: "#", external: true },
+        ],
+    },
+    {
+        title: "API",
+        links: [
+            { text: "Platform overview", href: "#" },
+            { text: "Pricing", href: "#" },
+            { text: "Documentation", href: "#", external: true },
+            { text: "API login", href: "#", external: true },
+        ],
+    },
+    {
+        title: "Explore more",
+        links: [
+            { text: "WEBSPACEAI for business", href: "#" },
+            { text: "Stories", href: "#" },
+        ],
+    },
+    {
+        title: "Safety",
+        links: [
+            { text: "Safety Framework", href: "/safety" },
+            { text: "Safety standards", href: "#" },
+        ],
+    },
+    {
+        title: "Teams",
+        links: [
+            { text: "Safety Systems", href: "#" },
+            { text: "Preparedness", href: "#" },
+            { text: "Superalignment", href: "#" },
+        ],
+    },
+    {
+        title: "Company",
+        links: [
+            { text: "About us", href: "#" },
+            { text: "News", href: "#" },
+            { text: "Our Charter", href: "#" },
+            { text: "Security", href: "#" },
+            { text: "Residency", href: "#" },
+            { text: "Careers", href: "#" },
+        ],
+    },
+    {
+        title: "Terms & policies",
+        links: [
+            { text: "Terms of use", href: "#" },
+            { text: "Privacy policy", href: "#" },
+            { text: "Brand guidelines", href: "#" },
+            { text: "Other policies", href: "#" },
+        ],
+    },
+];
+--- END OF FILE constants/data.tsx ---
+
+--- START OF FILE components/Header.tsx ---
+import React, { useState, useEffect } from 'react';
+import { LogoIcon, MenuIcon, SunIcon, MoonIcon } from './icons';
+import { Menu } from './Menu';
+
+interface HeaderProps {
+    theme: 'dark' | 'light';
+    toggleTheme: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ theme, toggleTheme }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+        setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+        window.removeEventListener('scroll', handleScroll);
+        document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
+  return (
+    <>
+      <header className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5' : 'bg-transparent'}`}>
+        <div className="flex items-center justify-between p-4 md:px-8 lg:px-12 xl:px-24 h-20">
+          <div className="flex items-center space-x-4">
+            <a href="/" aria-label="WEBSPACEAI Homepage" className="hover:opacity-80 transition-opacity">
+              <LogoIcon className="h-8 md:h-9 w-auto invert dark:invert-0" />
+            </a>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+                onClick={toggleTheme}
+                className="text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group"
+                aria-label="Toggle theme"
+            >
+                {theme === 'dark' ? (
+                   <SunIcon className="w-5 h-5 opacity-80 group-hover:opacity-100" />
+                ) : (
+                   <MoonIcon className="w-5 h-5 opacity-80 group-hover:opacity-100" />
+                )}
+            </button>
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-200 group"
+              aria-label="Open menu"
+            >
+              <MenuIcon className="w-6 h-6 opacity-80 group-hover:opacity-100" />
+            </button>
+          </div>
+        </div>
+      </header>
+      <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+    </>
+  );
+};
+--- END OF FILE components/Header.tsx ---
+
+--- START OF FILE components/Hero.tsx ---
+import React, { useState, useEffect } from 'react';
+import { heroSlides } from '../constants/data';
+import { ArrowRightIcon } from './icons';
+
+export const Hero: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const slide = heroSlides[currentSlide];
+
+  return (
+    <section className="relative w-full h-[65vh] md:h-[75vh] my-4 rounded-3xl overflow-hidden group bg-black">
+      {/* Background Layer */}
+      <div className="w-full h-full overflow-hidden absolute inset-0">
+          {heroSlides.map((s, index) => (
+             <div 
+                key={index}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+             >
+                <div 
+                    className={`w-full h-full bg-cover bg-center ${index === currentSlide ? 'animate-subtle-zoom' : ''}`}
+                    style={{ backgroundImage: `url(${s.imageUrl})` }}
+                />
+             </div>
+          ))}
+      </div>
+        
+      {/* Gradient Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30 z-20 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-transparent to-black/40 z-20 pointer-events-none"></div>
+
+      {/* Content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-6 z-30">
+        <div className="max-w-4xl mx-auto">
+            {/* Title */}
+            <div key={`title-${currentSlide}`} className="overflow-visible mb-6">
+                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight animate-slide-up-fade opacity-0 fill-mode-forwards leading-tight">
+                    {slide.title}
+                 </h1>
+            </div>
+            
+            {/* Description */}
+            <div key={`desc-${currentSlide}`} className="overflow-visible mb-10">
+                <p className="text-lg md:text-2xl text-gray-200 max-w-2xl mx-auto leading-relaxed animate-slide-up-fade-delay-1 opacity-0 fill-mode-forwards font-light">
+                    {slide.description}
+                </p>
+            </div>
+
+            {/* Button */}
+            <div key={`btn-${currentSlide}`} className="animate-slide-up-fade-delay-2 opacity-0 fill-mode-forwards">
+                <button className="bg-white text-black font-medium py-4 px-8 rounded-full flex items-center space-x-2 mx-auto hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] active:scale-95 group/btn">
+                    <span>{slide.buttonText}</span>
+                    <ArrowRightIcon className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                </button>
+            </div>
+        </div>
+      </div>
+
+      {/* Progress Indicators */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex space-x-3 z-40">
+        {heroSlides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className="group relative h-1.5 rounded-full overflow-hidden transition-all duration-500 ease-out backdrop-blur-sm"
+            style={{ width: currentSlide === index ? '48px' : '24px', backgroundColor: 'rgba(255,255,255,0.3)' }}
+            aria-label={`Go to slide ${index + 1}`}
+          >
+             {currentSlide === index && (
+                <div className="absolute inset-y-0 left-0 bg-white w-full animate-progress origin-left" />
+             )}
+             <div className="absolute inset-y-0 left-0 w-full bg-white opacity-0 group-hover:opacity-50 transition-opacity" />
+          </button>
+        ))}
+      </div>
+
+      <style>{`
+        .fill-mode-forwards {
+            animation-fill-mode: forwards;
+        }
+        
+        @keyframes subtle-zoom {
+            0% { transform: scale(1) translate(0,0); }
+            100% { transform: scale(1.1) translate(-1%, -1%); }
+        }
+
+        @keyframes slide-up-fade {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes progress {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        .animate-subtle-zoom {
+            animation: subtle-zoom 20s ease-in-out infinite alternate;
+        }
+
+        .animate-slide-up-fade {
+            animation: slide-up-fade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .animate-slide-up-fade-delay-1 {
+            animation: slide-up-fade 0.8s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .animate-slide-up-fade-delay-2 {
+            animation: slide-up-fade 0.8s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .animate-progress {
+            animation: progress 6s linear;
+        }
+      `}</style>
+    </section>
+  );
+};
+--- END OF FILE components/Hero.tsx ---
+
+--- START OF FILE components/Card.tsx ---
+import React, { useRef, useState } from 'react';
+import { CardData } from '../types';
+import { ArrowRightIcon } from './icons';
+
+const CodeLine: React.FC<{ line: string }> = ({ line }) => {
+    const numberMatch = line.match(/^(\d+)\s/);
+    const lineNumber = numberMatch ? numberMatch[1] : '';
+    const code = numberMatch ? line.substring(lineNumber.length).trim() : line;
+
+    const renderCode = () => {
+        let coloredCode = code;
+        const keywords = ['from', 'import', 'client', 'model', 'messages', 'role', 'content'];
+        const strings = code.match(/"(.*?)"/g) || [];
+        
+        keywords.forEach(keyword => {
+            const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+            coloredCode = coloredCode.replace(regex, `<span class="text-cyan-600 dark:text-cyan-400 font-semibold">${keyword}</span>`);
+        });
+
+        strings.forEach(str => {
+             coloredCode = coloredCode.replace(str, `<span class="text-green-600 dark:text-green-400">${str}</span>`);
+        });
+
+        return <span dangerouslySetInnerHTML={{ __html: coloredCode }} />;
+    };
+
+    return (
+        <div className="flex text-sm">
+            <span className="w-8 text-gray-400 dark:text-gray-500 text-right pr-4 select-none">{lineNumber}</span>
+            <span className="flex-1 text-gray-800 dark:text-gray-300">{renderCode()}</span>
+        </div>
+    );
+};
+
+interface TiltProps {
+    children: React.ReactNode;
+    className?: string;
+}
+
+const TiltCard: React.FC<TiltProps> = ({ children, className }) => {
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [transform, setTransform] = useState('');
+    const [glow, setGlow] = useState('opacity-0');
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Calculate rotation based on cursor position relative to center
+        // Limit max rotation to 3 degrees for subtlety
+        const rotateX = ((y - centerY) / centerY) * -3; 
+        const rotateY = ((x - centerX) / centerX) * 3;
+
+        setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);
+        
+        // Update glow position
+        const glowX = (x / rect.width) * 100;
+        const glowY = (y / rect.height) * 100;
+        (cardRef.current as any).style.setProperty('--glow-x', `${glowX}%`);
+        (cardRef.current as any).style.setProperty('--glow-y', `${glowY}%`);
+        setGlow('opacity-100');
+    };
+
+    const handleMouseLeave = () => {
+        setTransform('');
+        setGlow('opacity-0');
+    };
+
+    return (
+        <div 
+            ref={cardRef}
+            className={`relative transition-all duration-200 ease-out preserve-3d shadow-xl dark:shadow-none ${className}`}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{ transform }}
+        >
+             <div 
+                className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 bg-[radial-gradient(circle_at_var(--glow-x)_var(--glow-y),rgba(0,0,0,0.05),transparent_80%)] dark:bg-[radial-gradient(circle_at_var(--glow-x)_var(--glow-y),rgba(255,255,255,0.1),transparent_80%)] ${glow}`}
+            />
+            {children}
+        </div>
+    );
+};
+
+
+export const Card: React.FC<CardData & { layout?: 'default' | 'horizontal' }> = ({
+  category,
+  date,
+  title,
+  imageUrl,
+  bgColor = 'bg-white dark:bg-gray-900',
+  textColor = 'text-gray-900 dark:text-white',
+  logo,
+  codeSnippet,
+  linkText,
+  layout = 'default',
+}) => {
+  if (layout === 'horizontal') {
+    return (
+      <TiltCard className={`flex-shrink-0 w-[300px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden group border border-gray-100 dark:border-gray-800 ${textColor} ${!imageUrl ? `${bgColor} dark:bg-gradient-to-br from-gray-800/80 to-gray-900/90` : ''}`}>
+        {imageUrl && (
+          <>
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+              style={{ backgroundImage: `url(${imageUrl})` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          </>
+        )}
+        <div className="relative z-10 flex flex-col h-full p-6">
+          {/* Top Section */}
+          <div className="flex justify-between items-start">
+            <div className="text-sm">
+              <p className={`font-semibold ${imageUrl ? 'text-white' : ''}`}>{category}</p>
+              {date && <p className={`opacity-80 ${imageUrl ? 'text-gray-200' : ''}`}>{date}</p>}
+            </div>
+            {linkText !== "" && (
+               <div className={`w-8 h-8 rounded-full flex items-center justify-center -mr-2 -mt-2 transition-colors duration-300 ${imageUrl ? 'bg-white/10 group-hover:bg-white text-white group-hover:text-black' : 'bg-black/5 dark:bg-white/10 group-hover:bg-black dark:group-hover:bg-white text-black dark:text-white group-hover:text-white dark:group-hover:text-black'}`}>
+                   <ArrowRightIcon className="w-4 h-4 transition-colors"/>
+              </div>
+            )}
+          </div>
+
+          {/* Middle/Logo Section */}
+          {logo && <div className="flex-grow flex items-center justify-center">{logo}</div>}
+
+          {/* Code Snippet Section */}
+          {codeSnippet && (
+              <div className="flex-grow flex items-center justify-center font-mono text-left text-xs bg-gray-50 dark:bg-black/60 backdrop-blur-md rounded-lg p-4 my-4 -mx-2 border border-gray-200 dark:border-white/10 shadow-inner">
+                  <pre className="max-h-full overflow-y-auto"><code>{codeSnippet.code.split('\n').map((line, i) => <CodeLine key={i} line={line} />)}</code></pre>
+              </div>
+          )}
+          
+          {/* Bottom Section */}
+          <div className={`mt-auto ${logo ? 'text-center' : ''} pt-4`}>
+            <h3 className={`text-xl font-semibold leading-tight ${imageUrl ? 'text-white' : ''}`}>{title}</h3>
+            {linkText && <span className="text-sm font-semibold mt-2 inline-block">{linkText}</span>}
+          </div>
+        </div>
+      </TiltCard>
+    );
+  }
+  
+  // Vertical / Default Card Content
+  return (
+    <div className="aspect-[4/5] md:aspect-[3/4]">
+       <TiltCard className={`h-full w-full rounded-2xl overflow-hidden p-6 flex flex-col justify-between group border border-gray-100 dark:border-gray-800 ${textColor} ${!imageUrl ? `${bgColor} dark:bg-gradient-to-br from-gray-800 to-gray-900` : ''}`}>
+        {imageUrl && (
+            <>
+            <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+                style={{ backgroundImage: `url(${imageUrl})` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+            </>
+        )}
+
+        <div className="relative z-10 flex flex-col h-full">
+            {/* Top Section */}
+            <div className="flex justify-between items-start">
+            <div className="text-sm">
+                <p className={`font-semibold ${imageUrl ? 'text-white' : ''}`}>{category}</p>
+                {date && <p className={`opacity-80 ${imageUrl ? 'text-gray-200' : ''}`}>{date}</p>}
+            </div>
+            {linkText !== "" && (
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center -mr-2 -mt-2 transition-colors duration-300 ${imageUrl ? 'bg-white/10 group-hover:bg-white text-white group-hover:text-black' : 'bg-black/5 dark:bg-white/10 group-hover:bg-black dark:group-hover:bg-white text-black dark:text-white group-hover:text-white dark:group-hover:text-black'}`}>
+                    <ArrowRightIcon className="w-4 h-4 transition-colors"/>
+                </div>
+            )}
+            </div>
+
+            {/* Middle/Logo Section */}
+            {logo && <div className="flex-grow flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">{logo}</div>}
+            
+            {/* Bottom Section */}
+            <div className={`mt-auto ${logo ? 'text-center' : ''}`}>
+            <h3 className={`text-2xl font-semibold leading-tight ${imageUrl ? 'text-white' : ''}`}>{title}</h3>
+            {linkText && <span className="text-sm font-semibold mt-2 inline-block border-b border-transparent group-hover:border-current transition-colors">{linkText}</span>}
+            </div>
+        </div>
+      </TiltCard>
+    </div>
+  );
+};
+--- END OF FILE components/Card.tsx ---
+
+--- START OF FILE components/CallToAction.tsx ---
+import React from 'react';
+import { ArrowRightIcon } from './icons';
+
+export const CallToAction: React.FC = () => {
+  return (
+    <section className="text-center py-20 md:py-32">
+      <h2 className="text-4xl md:text-5xl font-bold max-w-3xl mx-auto mb-8 leading-tight text-gray-900 dark:text-white">
+        Instant answers. Greater productivity. Endless inspiration.
+      </h2>
+      <button className="bg-black dark:bg-white text-white dark:text-black font-semibold py-3 px-6 rounded-full flex items-center space-x-2 mx-auto hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
+        <span>Try our Product</span>
+        <ArrowRightIcon />
+      </button>
+    </section>
+  );
+};
+--- END OF FILE components/CallToAction.tsx ---
+
+--- START OF FILE components/Footer.tsx ---
+import React from 'react';
+import { footerLinks } from '../constants/data';
+import { LogoIcon, ArrowRightIcon, SocialIcons } from './icons';
+
+export const Footer: React.FC = () => {
+  return (
+    <footer className="bg-gray-50 dark:bg-[#111] text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-900 pt-24 pb-12 px-4 md:px-8 lg:px-12 xl:px-24 transition-colors duration-300">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-x-8 gap-y-12 mb-20">
+        {footerLinks.map((column) => (
+          <div key={column.title}>
+            <h3 className="text-gray-900 dark:text-white font-semibold mb-5">{column.title}</h3>
+            <ul className="space-y-3">
+              {column.links.map((link) => (
+                <li key={link.text}>
+                  <a href={link.href} className="hover:text-black dark:hover:text-white transition-colors flex items-center text-sm group">
+                    <span>{link.text}</span>
+                    {link.external && <ArrowRightIcon className="w-3 h-3 ml-1 opacity-60 group-hover:opacity-100 transition-opacity" />}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t border-gray-200 dark:border-gray-900 pt-10 flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0">
+        <div className="flex items-center space-x-4">
+          <LogoIcon className="h-6 w-auto invert dark:invert-0 opacity-80" />
+          <span className="text-sm">WEBSPACEAI © 2025</span>
+        </div>
+        <SocialIcons />
+      </div>
+    </footer>
+  );
+};
+--- END OF FILE components/Footer.tsx ---
+
+--- START OF FILE components/Search.tsx ---
+import React from 'react';
+
+// Search functionality has been removed.
+export const Search: React.FC<any> = () => null;
+--- END OF FILE components/Search.tsx ---
+
+--- START OF FILE components/Menu.tsx ---
+import React, { useEffect } from 'react';
+import { CloseIcon, ArrowRightIcon } from './icons';
+import { menuLinks } from '../constants/data';
+
+interface MenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <div
+      id="menu-overlay"
+      className={`fixed inset-0 z-50 bg-white/95 dark:bg-black/80 backdrop-blur-lg transition-opacity duration-300 ${
+        isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+      aria-modal="true"
+      role="dialog"
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-6 right-6 text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 z-50"
+        aria-label="Close menu"
+      >
+        <CloseIcon className="w-8 h-8" />
+      </button>
+
+      <div className="flex items-center justify-center h-full text-gray-900 dark:text-white px-4 md:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 w-full max-w-5xl">
+            {menuLinks.map((column) => (
+              <div key={column.title}>
+                <h3 className="text-xl font-semibold mb-6">{column.title}</h3>
+                <ul className="space-y-4">
+                  {column.links.map((link) => (
+                    <li key={link.text}>
+                      <a href={link.href} className="text-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors flex items-center group">
+                        <span>{link.text}</span>
+                        <ArrowRightIcon className="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+--- END OF FILE components/Menu.tsx ---
+
+--- START OF FILE pages/HomePage.tsx ---
+import React from 'react';
+import { Hero } from '../components/Hero';
+import { Card } from '../components/Card';
+import { CallToAction } from '../components/CallToAction';
+import {
+  productCards,
+  researchCards,
+  newsCards,
+} from '../constants/data';
+import { CardData } from '../types';
+import { ArrowRightIcon } from '../components/icons';
+
+const HorizontalSection: React.FC<{ title: string; cards: CardData[] }> = ({ title, cards }) => (
+    <section className="py-12">
+        <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
+            <a href="#" className="text-sm font-semibold text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white flex items-center gap-1 transition-colors group">
+                <span>View all</span>
+                <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </a>
+        </div>
+        <div className="relative">
+            <div className="flex overflow-x-auto space-x-6 pb-6 -mb-6 px-1">
+                {cards.map((card, index) => (
+                    <Card key={index} {...card} layout="horizontal" />
+                ))}
+                <div className="flex-shrink-0 w-1"></div>
+            </div>
+        </div>
+    </section>
+);
+
+const HomePage: React.FC = () => {
+  return (
+    <main className="px-4 md:px-8 lg:px-12 xl:px-24">
+      <Hero />
+      <HorizontalSection title="Product" cards={productCards} />
+      <HorizontalSection title="Research" cards={researchCards} />
+      <HorizontalSection title="News" cards={newsCards} />
+      <CallToAction />
+    </main>
+  );
+};
+
+export default HomePage;
+--- END OF FILE pages/HomePage.tsx ---
+
+--- START OF FILE pages/SafetyPage.tsx ---
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { ChevronDownIcon, CapabilityRiskIcon, ThresholdsIcon, SafeguardsIcon, EvaluationIcon, GovernanceIcon, MonitoringIcon, ReportingIcon, ResearchIcon } from '../components/icons';
+
+// Data for the page content, kept inside component for encapsulation
+const principles = [
+    { title: 'Capability‑Risk Alignment', text: 'Safety requirements scale with model capability.', icon: CapabilityRiskIcon },
+    { title: 'Clear Thresholds', text: 'Measurable triggers signal transitions to the next safety tier.', icon: ThresholdsIcon },
+    { title: 'Layered Safeguards', text: 'Combine technical, procedural, and organizational measures.', icon: SafeguardsIcon },
+    { title: 'Rigorous Evaluation', text: 'Formalize testing, including adversarial probes and red teaming.', icon: EvaluationIcon },
+    { title: 'Accountable Governance', text: 'Establish oversight bodies to review and approve deployments.', icon: GovernanceIcon },
+    { title: 'Continuous Monitoring', text: 'Deploy real‑time telemetry to track model behavior.', icon: MonitoringIcon },
+    { title: 'Transparent Reporting', text: 'Document assessments, incidents, and mitigation steps.', icon: ReportingIcon },
+    { title: 'Research Integration', text: 'Stay current with AI safety research and incorporate it.', icon: ResearchIcon }
+];
+
+const safetyLevels = [
+    { level: 1, title: "Foundational Safety", objective: "Implement basic controls to prevent trivial failures and obvious misuse in narrow, low-impact systems.", applicability: ["Rule-based classification APIs", "Simple Q&A bots with closed knowledge bases", "Recommendation engines with limited scope"], measures: ["Input Validation & Output Constraints", "Access Controls & Authentication", "Unit Tests & Manual Reviews", "Documentation & Onboarding"], caseStudy: "A retail company deploys a Level 1 sentiment analysis API to filter customer reviews. By enforcing profanity filters, logging every API call, and limiting access to internal clients, the team prevents both malicious inputs and accidental leakage of user data." },
+    { level: 2, title: "Enhanced Safety for Interactive Systems", objective: "Introduce moderate adversarial defenses and basic monitoring to address common risks in interactive, generative, or conversational applications.", applicability: ["Entry‑level chatbots with domain constraints", "Constrained virtual assistants", "Simple generative tools"], measures: ["Robust Filtering & Refusal Triggers", "Sandboxing & Anomaly Detection", "Basic Red Teaming", "Incident Response Planning"], caseStudy: "A financial services chatbot at Level 2 employs semantic detection to refuse queries requesting investment advice. All code snippets are sandboxed, and alerts notify security if anomalous resource consumption occurs. Basic red teaming uncovers a prompt bypass; the fix is rolled out within 48 hours." },
+    { level: 3, title: "Substantial Safety for Capable Systems", objective: "Defend against sophisticated misuse, integrate human oversight for high‑stakes actions, and deepen adversarial resilience.", applicability: ["Advanced conversational agents", "Media and code generation tools", "Systems accessing external data"], measures: ["Constitutional‑Style Jailbreak Defenses", "Behavioral Monitoring", "Expert Red Teaming & Ethical Review", "Formal Safety Cases"], caseStudy: "A healthcare assistant at Level 3 provides medical literature summaries. Using a constitutional AI approach, it refuses requests for personalized diagnoses. An external panel of medical and AI safety experts reviews test logs and endorses the system’s safety case before it goes live." },
+    { level: 4, title: "Advanced Safety for Near‑Frontier Systems", objective: "Anticipate and mitigate emergent behaviors in general‑purpose systems nearing human‑level performance.", applicability: ["Multi‑modal models (text, vision, audio)", "Large foundation models", "Experimental agentic systems"], measures: ["Scaled Constitutional AI & RLHF", "Mechanistic Interpretability", "External Expert Validation", "Regulatory Coordination"], caseStudy: "A lab's multimodal reasoning engine reaches near-human benchmarks. Mechanistic interpretability reveals potential corruption of planning circuits; predictive detectors flag these cases. After an external AI safety audit, the team updates RLHF policies and secures compliance certification." },
+    { level: 5, title: "AGI‑Level Safety", objective: "Manage existential and systemic risks posed by systems at or beyond human intelligence—ensuring provable control and global governance.", applicability: ["Experimental AGI prototypes", "Agentic systems with strategic planning", "Large-scale multi‑agent ecosystems"], measures: ["Provably Robust Alignment", "Hardware & Network Failsafes", "AI‑Assisted Oversight", "Global Governance"], caseStudy: "A consortium collaborates on an AGI testbed. Formal methods verify the system cannot override shutdown commands. Red team exercises simulate strategic scenarios, revealing hidden incentives that are then mathematically neutralized. A global governance council reviews logs, ensuring transparency." }
+];
+
+const gettingStartedSteps = [
+    { title: 'Capability Assessment', text: 'Catalog your AI projects and map each to the corresponding safety level.' },
+    { title: 'Gap Analysis', text: 'List required safety measures that are not yet implemented and prioritize them by risk.' },
+    { title: 'Roadmap Development', text: 'Create a timeline for implementing missing safeguards, starting with the highest-risk projects.' },
+    { title: 'Governance Structure', text: 'Establish safety review committees with clear roles, responsibilities, and decision-rights.' },
+    { title: 'Measurement & Monitoring', text: 'Build dashboards to track key safety metrics and set up alerting thresholds.' },
+    { title: 'Training & Culture', text: 'Educate all teams on the framework and foster a culture of “safety by design.”' },
+    { title: 'Iterate & Evolve', text: 'Review framework thresholds and measures quarterly, incorporating new safety research and lessons learned.' }
+];
+
+const Section: React.FC<{ id: string; observerRef: React.RefObject<HTMLDivElement>; children: React.ReactNode, className?: string }> = ({ id, observerRef, children, className = 'py-16' }) => (
+    <section id={id} ref={observerRef} className={`scroll-mt-20 ${className}`}>
+        {children}
+    </section>
+);
+
+const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white mb-10">{children}</h2>
+);
+
+const PrincipleCard: React.FC<{ principle: typeof principles[0]; index: number }> = ({ principle, index }) => {
+    const Icon = principle.icon;
+    const [isVisible, setIsVisible] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { 
+                threshold: 0.1,
+                rootMargin: '50px' 
+            }
+        );
+
+        if (cardRef.current) {
+            observer.observe(cardRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div 
+            ref={cardRef}
+            style={{ transitionDelay: `${index * 100}ms` }}
+            className={`bg-white dark:bg-gray-900/50 p-6 rounded-lg border border-gray-200 dark:border-gray-800 transition-all duration-700 ease-out hover:border-blue-500/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/10 ${
+                isVisible 
+                    ? 'opacity-100 translate-y-0 blur-0' 
+                    : 'opacity-0 translate-y-12 blur-[2px]'
+            }`}
+        >
+            <Icon className="w-8 h-8 mb-4 text-blue-600 dark:text-blue-400" />
+            <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-2">{principle.title}</h4>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">{principle.text}</p>
+        </div>
+    );
+};
+
+const LevelAccordionItem: React.FC<{ levelData: typeof safetyLevels[0]; isOpen: boolean; onToggle: () => void; isLast: boolean }> = ({ levelData, isOpen, onToggle, isLast }) => {
+    const [activeTab, setActiveTab] = useState('objective');
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    return (
+        <div className="relative pl-12 py-4">
+            {!isLast && <div className="absolute top-10 left-[21px] w-0.5 h-full bg-gray-200 dark:bg-gray-800"></div>}
+            <div className={`absolute top-5 left-0 w-11 h-11 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${isOpen ? 'bg-blue-600 dark:bg-blue-500 border-blue-500 dark:border-blue-400' : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'}`}>
+                <span className={`text-xl font-bold transition-colors duration-300 ${isOpen ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}>{levelData.level}</span>
+            </div>
+            <button onClick={onToggle} className="w-full text-left flex justify-between items-center group">
+                <h3 className={`text-xl md:text-2xl font-bold transition-colors duration-300 ${isOpen ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-300'}`}>{levelData.title}</h3>
+                <ChevronDownIcon className={`w-6 h-6 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <div
+                ref={contentRef}
+                style={{ maxHeight: isOpen ? contentRef.current?.scrollHeight : 0, transition: 'max-height 0.5s ease-in-out' }}
+                className="overflow-hidden"
+            >
+                <div className="pt-6">
+                    <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+                        <nav className="-mb-px flex space-x-6 overflow-x-auto pb-1" aria-label="Tabs">
+                            {['objective', 'applicability', 'measures', 'case study'].map((tab) => (
+                                <button key={tab} onClick={() => setActiveTab(tab)} className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm capitalize transition-colors ${activeTab === tab ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'}`}>
+                                    {tab}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-300 leading-relaxed min-h-[150px]">
+                        {activeTab === 'objective' && <p>{levelData.objective}</p>}
+                        {activeTab === 'applicability' && <ul className="list-disc list-inside space-y-2">{levelData.applicability.map(item => <li key={item}>{item}</li>)}</ul>}
+                        {activeTab === 'measures' && <ul className="list-disc list-inside space-y-2">{levelData.measures.map(item => <li key={item}>{item}</li>)}</ul>}
+                        {activeTab === 'case study' && <p className="italic text-gray-700 dark:text-gray-400">{levelData.caseStudy}</p>}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SafetyPage: React.FC = () => {
+    const [activeSection, setActiveSection] = useState('introduction');
+    const [expandedLevel, setExpandedLevel] = useState<number | null>(1);
+    
+    const navItems = ['Introduction', 'Core Principles', 'The Five Levels', 'Getting Started', 'Conclusion'];
+
+    const sectionRefs = {
+        introduction: useRef<HTMLDivElement>(null),
+        'core-principles': useRef<HTMLDivElement>(null),
+        'the-five-levels': useRef<HTMLDivElement>(null),
+        'getting-started': useRef<HTMLDivElement>(null),
+        conclusion: useRef<HTMLDivElement>(null),
+    };
+
+    const observer = useMemo(() => {
+        if (typeof window !== 'undefined') {
+            return new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setActiveSection(entry.target.id);
+                        }
+                    });
+                },
+                { rootMargin: '-30% 0px -70% 0px' }
+            );
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!observer) return;
+        const refs = Object.values(sectionRefs);
+        refs.forEach(ref => {
+            if (ref.current) observer.observe(ref.current);
+        });
+        return () => {
+             refs.forEach(ref => {
+                if (ref.current) observer.unobserve(ref.current);
+            });
+        };
+    }, [observer, sectionRefs]);
+
+    const handleNavClick = (id: string) => {
+        const ref = sectionRefs[id as keyof typeof sectionRefs];
+        ref.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    return (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            <div className="text-center mb-24">
+                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-500 mb-4">The AI Safety Framework</h1>
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+                    A comprehensive, scalable model for managing AI risks—designed to evolve alongside AI capabilities.
+                </p>
+            </div>
+
+            <div className="flex flex-col lg:flex-row gap-16 xl:gap-24">
+                <aside className="hidden lg:block lg:w-1/4 sticky top-24 self-start">
+                    <nav>
+                        <ul className="space-y-3">
+                            {navItems.map(item => {
+                                const id = item.toLowerCase().replace(/ /g, '-');
+                                const isActive = activeSection === id;
+                                return (
+                                    <li key={item}>
+                                        <button onClick={() => handleNavClick(id)} className={`flex items-center w-full text-left transition-colors duration-200 group`}>
+                                            <span className={`w-0.5 h-6 mr-4 rounded-full ${isActive ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-400 dark:group-hover:bg-gray-500'}`}></span>
+                                            <span className={`${isActive ? 'text-gray-900 dark:text-white font-semibold' : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white'}`}>{item}</span>
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </nav>
+                </aside>
+
+                <div className="lg:w-3/4">
+                    <Section id="introduction" observerRef={sectionRefs.introduction}>
+                        <SectionTitle>Introduction</SectionTitle>
+                        <div className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed space-y-6">
+                            <p>Artificial intelligence (AI) continues to transform industries, drive innovation, and reshape the way we live and work. From personalized recommendations on e‑commerce sites to sophisticated autonomous agents assisting with complex tasks, AI’s potential is vast. Yet, as capability grows, so too do risks—ranging from benign malfunctions to adversarial exploitation and, in the extreme, existential threats to humanity. Organizations that lead in AI development must therefore embrace a safety-first mindset, ensuring that every new model, tool, or deployment includes appropriate guardrails.</p>
+                            <p>This Five-Level AI Safety Framework offers a structured approach to scaling safety measures in lockstep with AI capabilities. Rather than a one-size-fits-all checklist, it provides explicit thresholds, layered safeguards, and governance processes that grow more rigorous as AI systems become more powerful. Whether you are launching a simple classifier, integrating a generative assistant into customer service, or developing near-human-level general-purpose models, this framework delivers clear guidance on what controls, monitoring, and oversight are required.</p>
+                        </div>
+                    </Section>
+                    
+                    <Section id="core-principles" observerRef={sectionRefs['core-principles']}>
+                        <SectionTitle>Core Principles</SectionTitle>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+                            {principles.map((p, i) => (
+                                <PrincipleCard key={p.title} principle={p} index={i} />
+                            ))}
+                        </div>
+                    </Section>
+
+                    <Section id="the-five-levels" observerRef={sectionRefs['the-five-levels']}>
+                        <SectionTitle>The Five Levels</SectionTitle>
+                        <div className="space-y-2">
+                             {safetyLevels.map((level, index) => (
+                                <LevelAccordionItem
+                                    key={level.level}
+                                    levelData={level}
+                                    isOpen={expandedLevel === level.level}
+                                    onToggle={() => setExpandedLevel(expandedLevel === level.level ? null : level.level)}
+                                    isLast={index === safetyLevels.length - 1}
+                                />
+                             ))}
+                        </div>
+                    </Section>
+
+                    <Section id="getting-started" observerRef={sectionRefs['getting-started']}>
+                        <SectionTitle>Getting Started</SectionTitle>
+                        <ol className="space-y-10 custom-ol">
+                            {gettingStartedSteps.map((step, index) => (
+                                <li key={step.title}>
+                                    <div>
+                                        <h4 className="font-bold text-lg text-gray-900 dark:text-white mb-2">{step.title}</h4>
+                                        <p className="text-gray-600 dark:text-gray-400">{step.text}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ol>
+                    </Section>
+                    
+                    <Section id="conclusion" observerRef={sectionRefs.conclusion} className="py-16 border-t border-gray-200 dark:border-gray-800 mt-16">
+                        <SectionTitle>Conclusion</SectionTitle>
+                        <div className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed space-y-6">
+                            <p>The Five-Level AI Safety Framework empowers organizations to navigate the advancing frontier of AI responsibly. By aligning safety requirements with capability, establishing clear thresholds, layered complementary defenses, and embedding rigorous governance, teams can innovate at pace without sacrificing security or ethical integrity. From foundational safeguards for simple models to provably robust controls for AGI, this tiered approach fosters clarity, accountability, and resilience.</p>
+                            <p>Adopting the framework is not a one‑off project but an ongoing commitment—requiring continuous monitoring, regular audits, and a culture that embraces safety as a core priority. With this holistic model, organizations can harness the transformative potential of AI while safeguarding against its risks, ensuring that technological progress remains firmly in service of human well‑being.</p>
+                        </div>
+                    </Section>
+                </div>
+            </div>
+        </main>
+    );
+};
+
+export default SafetyPage;
+--- END OF FILE pages/SafetyPage.tsx ---

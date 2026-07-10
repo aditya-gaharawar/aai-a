@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --border-color: #e5e7eb;
+}
+
+.dark {
+  --bg-color: #050505;
+  --text-color: #e5e7eb;
+  --border-color: #374151;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* ─── Trust Center Policy Styles ─── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Policy prose content */
+.policy-prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.policy-prose ul,
+.policy-prose ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.policy-prose ul {
+  list-style-type: disc;
+}
+
+.policy-prose ol {
+  list-style-type: decimal;
+}
+
+.policy-prose li {
+  margin-bottom: 0.5rem;
+  line-height: 1.65;
+}
+
+.policy-prose strong {
+  font-weight: 600;
+}
+
+.policy-prose a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.policy-prose a:hover {
+  color: #000;
+}
+
+.dark .policy-prose a:hover {
+  color: #fff;
+}
+
+/* Policy cross-ref links */
+.policy-cross-ref {
+  color: #3b82f6;
+  text-decoration: underline;
+  text-decoration-color: rgba(59, 130, 246, 0.3);
+  text-underline-offset: 2px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.policy-cross-ref:hover {
+  color: #2563eb;
+  text-decoration-color: #2563eb;
+}
+
+.dark .policy-cross-ref {
+  color: #60a5fa;
+  text-decoration-color: rgba(96, 165, 250, 0.3);
+}
+
+.dark .policy-cross-ref:hover {
+  color: #93bbfd;
+  text-decoration-color: #93bbfd;
+}
+
+/* Fix badge animation */
+@keyframes fix-badge-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  50% { box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.15); }
+}
+
+.fix-badge-glow {
+  animation: fix-badge-glow 3s ease-in-out infinite;
+}
+
+/* Sidebar scrollbar */
+.policy-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.policy-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.policy-sidebar::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+
+.dark .policy-sidebar::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+/* Active section highlight in TOC */
+.toc-link-active {
+  color: #000 !important;
+  font-weight: 500;
+}
+
+.dark .toc-link-active {
+  color: #fff !important;
+}
+
+/* Policy section left border accent */
+.policy-section-accent {
+  border-left: 2px solid transparent;
+  padding-left: 1.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.policy-section-accent:hover {
+  border-left-color: #e5e7eb;
+}
+
+.dark .policy-section-accent:hover {
+  border-left-color: #333;
+}
+
+/* Category badge colors */
+.cat-legal { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
+.cat-safety { background-color: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.2); }
+.cat-governance { background-color: rgba(234, 179, 8, 0.1); color: #eab308; border-color: rgba(234, 179, 8, 0.2); }
+.cat-compliance { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2); }
+
+.dark .cat-legal { background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+.dark .cat-safety { background-color: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
+.dark .cat-governance { background-color: rgba(234, 179, 8, 0.15); color: #facc15; border-color: rgba(234, 179, 8, 0.3); }
+.dark .cat-compliance { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }

@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import { useEffect, useState } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import '../styles/globals.css';
 
 // Read the saved theme synchronously before first render to avoid flash
@@ -54,6 +55,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <Component {...pageProps} />
         <Footer />
       </div>
+      <SpeedInsights />
     </>
   );
 }

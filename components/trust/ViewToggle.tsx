@@ -12,9 +12,9 @@ interface ViewToggleProps {
 export const ViewToggle: React.FC<ViewToggleProps> = ({ mode, onToggle }) => {
   return (
     <div
-      className="inline-flex p-1 bg-gray-100 dark:bg-[#050505]
-        border border-gray-200 dark:border-[#222]
-        rounded-xl dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]"
+      className="inline-flex p-1 bg-gray-100 dark:bg-[#111]
+        border border-gray-200 dark:border-[#333]
+        rounded-xl"
     >
       <ToggleButton
         label="Plain Language"
@@ -37,10 +37,10 @@ const ToggleButton: React.FC<{
 }> = ({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
-    className={`relative px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 focus:outline-none ${
+    className={`relative px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 focus:outline-none ${
       isActive
-        ? 'text-black dark:text-[#EDEDED] bg-white dark:bg-gradient-to-b dark:from-[#2a2a2a] dark:to-[#1a1a1a] shadow-sm dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),_0_2px_4px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-[#444]'
-        : 'text-gray-500 dark:text-[#666] hover:text-gray-900 dark:hover:text-[#AAA] border border-transparent hover:bg-white/50 dark:hover:bg-[#111]'
+        ? 'text-black dark:text-white bg-white dark:bg-black shadow-sm border border-gray-200 dark:border-[#333]'
+        : 'text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white border border-transparent'
     }`}
   >
     {label}

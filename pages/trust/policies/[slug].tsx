@@ -18,7 +18,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return {
     paths,
-    fallback: false,
+    // 'blocking' renders unknown slugs server-side in dev/preview,
+    // returning 404 via notFound:true in getStaticProps if the slug doesn't exist.
+    // All 39 known slugs are pre-generated at build time regardless.
+    fallback: 'blocking',
   };
 };
 

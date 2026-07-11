@@ -1,19 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design Tokens ─── */
+
 :root {
   --bg-color: #ffffff;
-  --text-color: #1f2937;
+  --text-color: #0a0a0a;
   --border-color: #e5e7eb;
+  --muted-color: #6b7280;
+  --surface-color: #f9fafb;
+  --accent-color: #0a0a0a;
 }
 
 .dark {
   --bg-color: #050505;
-  --text-color: #e5e7eb;
-  --border-color: #374151;
+  --text-color: #ededed;
+  --border-color: #222222;
+  --muted-color: #888888;
+  --surface-color: #0a0a0a;
+  --accent-color: #ededed;
+}
+
+/* ─── Base ─── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 html,
@@ -23,15 +41,19 @@ body {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ─── Scrollbars ─── */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -39,45 +61,55 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #000;
+  background: #d1d5db;
+  border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #2a2a2a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9ca3af;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #444;
 }
+
+/* ─── 3D Transforms ─── */
 
 .preserve-3d {
   transform-style: preserve-3d;
 }
 
-/* ─── Trust Center Policy Styles ─── */
+/* ─── Focus Visible ─── */
 
-html {
-  scroll-behavior: smooth;
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Policy prose content */
+/* ─── Trust Center: Policy Prose ─── */
+
+.policy-prose {
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: #374151;
+}
+
+.dark .policy-prose {
+  color: #aaaaaa;
+}
+
 .policy-prose p {
-  margin-bottom: 1rem;
-  line-height: 1.75;
+  margin-bottom: 1.25rem;
 }
 
 .policy-prose ul,
 .policy-prose ol {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   padding-left: 1.5rem;
 }
 
@@ -91,17 +123,27 @@ html {
 
 .policy-prose li {
   margin-bottom: 0.5rem;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 .policy-prose strong {
   font-weight: 600;
+  color: #111827;
+}
+
+.dark .policy-prose strong {
+  color: #ededed;
 }
 
 .policy-prose a {
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.15s ease;
+  color: #374151;
+}
+
+.dark .policy-prose a {
+  color: #aaaaaa;
 }
 
 .policy-prose a:hover {
@@ -112,44 +154,50 @@ html {
   color: #fff;
 }
 
-/* Policy cross-ref links */
+/* ─── Policy Cross-ref Links ─── */
+
 .policy-cross-ref {
-  color: #3b82f6;
+  color: #374151;
   text-decoration: underline;
-  text-decoration-color: rgba(59, 130, 246, 0.3);
+  text-decoration-color: rgba(55, 65, 81, 0.4);
   text-underline-offset: 2px;
+  font-weight: 500;
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .policy-cross-ref:hover {
-  color: #2563eb;
-  text-decoration-color: #2563eb;
+  color: #000;
+  text-decoration-color: #000;
 }
 
 .dark .policy-cross-ref {
-  color: #60a5fa;
-  text-decoration-color: rgba(96, 165, 250, 0.3);
+  color: #aaaaaa;
+  text-decoration-color: rgba(170, 170, 170, 0.4);
 }
 
 .dark .policy-cross-ref:hover {
-  color: #93bbfd;
-  text-decoration-color: #93bbfd;
+  color: #ededed;
+  text-decoration-color: #ededed;
 }
 
-/* Fix badge animation */
+/* ─── FixBadge animation ─── */
+
 @keyframes fix-badge-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-  50% { box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.15); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+  50% { box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.06); }
 }
 
-.fix-badge-glow {
-  animation: fix-badge-glow 3s ease-in-out infinite;
+@media (prefers-reduced-motion: no-preference) {
+  .fix-badge-glow {
+    animation: fix-badge-glow 4s ease-in-out infinite;
+  }
 }
 
-/* Sidebar scrollbar */
+/* ─── Policy Sidebar scrollbar ─── */
+
 .policy-sidebar::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .policy-sidebar::-webkit-scrollbar-track {
@@ -162,41 +210,152 @@ html {
 }
 
 .dark .policy-sidebar::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #2a2a2a;
 }
 
-/* Active section highlight in TOC */
+/* ─── Active TOC link ─── */
+
 .toc-link-active {
   color: #000 !important;
-  font-weight: 500;
+  font-weight: 600 !important;
 }
 
 .dark .toc-link-active {
-  color: #fff !important;
+  color: #ededed !important;
+  font-weight: 600 !important;
 }
 
-/* Policy section left border accent */
+.toc-link-active::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 0.875rem;
+  background: currentColor;
+  border-radius: 2px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* ─── Policy Section accent border ─── */
+
 .policy-section-accent {
-  border-left: 2px solid transparent;
-  padding-left: 1.5rem;
+  border-left: 2px solid #e5e7eb;
+  padding-left: 1.25rem;
   transition: border-color 0.2s ease;
 }
 
+.dark .policy-section-accent {
+  border-left-color: #222;
+}
+
 .policy-section-accent:hover {
-  border-left-color: #e5e7eb;
+  border-left-color: #9ca3af;
 }
 
 .dark .policy-section-accent:hover {
-  border-left-color: #333;
+  border-left-color: #444;
 }
 
-/* Category badge colors */
-.cat-legal { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
-.cat-safety { background-color: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.2); }
-.cat-governance { background-color: rgba(234, 179, 8, 0.1); color: #eab308; border-color: rgba(234, 179, 8, 0.2); }
-.cat-compliance { background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2); }
+/* ─── Hero animations ─── */
 
-.dark .cat-legal { background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
-.dark .cat-safety { background-color: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
-.dark .cat-governance { background-color: rgba(234, 179, 8, 0.15); color: #facc15; border-color: rgba(234, 179, 8, 0.3); }
-.dark .cat-compliance { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
+@media (prefers-reduced-motion: no-preference) {
+  .animate-subtle-zoom {
+    animation: subtle-zoom 20s ease-in-out infinite alternate;
+  }
+
+  .animate-slide-up-fade {
+    animation: slide-up-fade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .animate-slide-up-fade-delay-1 {
+    animation: slide-up-fade 0.8s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .animate-slide-up-fade-delay-2 {
+    animation: slide-up-fade 0.8s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .animate-progress {
+    animation: progress 6s linear;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-subtle-zoom,
+  .animate-slide-up-fade,
+  .animate-slide-up-fade-delay-1,
+  .animate-slide-up-fade-delay-2 {
+    animation: none;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .animate-progress {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes subtle-zoom {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.08) translate(-0.5%, -0.5%); }
+}
+
+@keyframes slide-up-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.99);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.fill-mode-forwards {
+  animation-fill-mode: forwards;
+}
+
+/* ─── Trust Center: category accent colors (subtle) ─── */
+
+.cat-legal        { --cat-dot: #64748b; }
+.cat-safety       { --cat-dot: #475569; }
+.cat-governance   { --cat-dot: #334155; }
+.cat-compliance   { --cat-dot: #1e293b; }
+
+.dark .cat-legal      { --cat-dot: #94a3b8; }
+.dark .cat-safety     { --cat-dot: #cbd5e1; }
+.dark .cat-governance { --cat-dot: #e2e8f0; }
+.dark .cat-compliance { --cat-dot: #f1f5f9; }
+
+/* ─── Transition Utilities ─── */
+
+.transition-height {
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+}
+
+/* ─── Mobile horizontal scroll containers ─── */
+
+.scroll-fade-right {
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+
+/* ─── Table responsive wrapper ─── */
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 640px;
+}

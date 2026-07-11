@@ -2,6 +2,7 @@ import React from 'react';
 
 interface PolicyTableOfContentsProps {
   sections: Array<{ heading: string }>;
+  activeSection?: string;
 }
 
 /** Convert a heading string to a URL-safe anchor id */
@@ -15,25 +16,26 @@ function headingToId(heading: string): string {
 }
 
 /**
- * In-page jump nav rendered as a compact card.
- * Lists all section headings as anchor links.
+ * In-page table of contents with active-section highlighting.
+ * Receives the current active section ID from PolicyPage via IntersectionObserver.
  */
-export const PolicyTableOfContents: React.FC<PolicyTableOfContentsProps> = ({ sections }) => {
+export const PolicyTableOfContents: React.FC<PolicyTableOfContentsProps> = ({
+  sections,
+  activeSection,
+}) => {
   if (!sections || sections.length === 0) return null;
 
   return (
-    <nav
-      className="bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-[#222]
-        rounded-xl p-6 transition-colors duration-200"
-      aria-label="Table of contents"
-    >
-      <h2 className="text-xs font-mono uppercase tracking-widest text-gray-500 dark:text-[#555] mb-4">
+    <nav aria-label="Table of contents">
+      <p className="text-[10px] font-mono uppercase tracking-widest text-gray-500 dark:text-[#555] mb-4">
         On this page
-      </h2>
+      </p>
 
-      <ul className="space-y-2">
+      <ul className="space-y-1.5">
         {sections.map((section) => {
           const id = headingToId(section.heading);
+          const isActive = activeSection === id;
+
           return (
             <li key={id}>
               <a
@@ -43,13 +45,15 @@ export const PolicyTableOfContents: React.FC<PolicyTableOfContentsProps> = ({ se
                   const el = document.getElementById(id);
                   if (el) {
                     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // Update URL hash without jumping
                     window.history.replaceState(null, '', `#${id}`);
                   }
                 }}
-                className="block text-sm text-gray-600 dark:text-[#888]
-                  hover:text-black dark:hover:text-white
-                  transition-colors duration-200 leading-relaxed"
+                className={`block text-[13px] leading-snug py-0.5 transition-all duration-150 ${
+                  isActive
+                    ? 'toc-link-active text-black dark:text-white font-medium'
+                    : 'text-gray-500 dark:text-[#888] hover:text-black dark:hover:text-white'
+                }`}
+                aria-current={isActive ? 'true' : undefined}
               >
                 {section.heading}
               </a>

@@ -50,16 +50,14 @@ const MetaItem: React.FC<{ label: string; value: string }> = ({ label, value }) 
     <span className="text-[10px] font-mono uppercase tracking-widest text-gray-500 dark:text-[#555]">
       {label}:
     </span>
-    <span className="text-xs text-gray-700 dark:text-[#AAA]">
+    <span className="text-sm font-medium text-gray-800 dark:text-[#CCC]">
       {value}
     </span>
   </div>
 );
 
 const Separator: React.FC = () => (
-  <span className="hidden sm:inline text-gray-300 dark:text-[#333] select-none" aria-hidden="true">
-    |
-  </span>
+  <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-gray-300 dark:bg-[#333] select-none" aria-hidden="true" />
 );
 
 export default PolicyMetaBar;

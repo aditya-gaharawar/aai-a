@@ -60,8 +60,8 @@ const TiltCard: React.FC<TiltProps> = ({ children, className }) => {
         // Update glow position
         const glowX = (x / rect.width) * 100;
         const glowY = (y / rect.height) * 100;
-        (cardRef.current as any).style.setProperty('--glow-x', `${glowX}%`);
-        (cardRef.current as any).style.setProperty('--glow-y', `${glowY}%`);
+        cardRef.current.style.setProperty('--glow-x', `${glowX}%`);
+        cardRef.current.style.setProperty('--glow-y', `${glowY}%`);
         setGlow('opacity-100');
     };
 

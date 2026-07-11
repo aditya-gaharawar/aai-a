@@ -20,15 +20,10 @@ function headingToId(heading: string): string {
 }
 
 /**
- * Process raw content string into React elements:
- * - Cross-references: (Doc. N) → linked Doc. N
- * - Fix badges: **[FIX — ...]** → FixBadge component
- * - Bold text: **text** → <strong>
- * - List items: lines starting with "- " → <li>
- * - Paragraph breaks: double newlines → <p>
+ * Process raw policy content string into React elements.
+ * Handles: cross-references, fix badges, bold text, lists, paragraphs.
  */
 function processContent(content: string): ReactNode[] {
-  // Split content into paragraphs first
   const paragraphs = content.split(/\n\n+/);
   const elements: ReactNode[] = [];
 
@@ -36,8 +31,9 @@ function processContent(content: string): ReactNode[] {
     const trimmed = paragraph.trim();
     if (!trimmed) return;
 
-    // Check if this paragraph is a list block (consecutive lines starting with -)
     const lines = trimmed.split('\n');
+
+    // Check if this block is a list (all lines start with "- " or are blank)
     const isListBlock = lines.every(
       (line) => line.trim().startsWith('- ') || line.trim() === ''
     );
@@ -50,13 +46,13 @@ function processContent(content: string): ReactNode[] {
             key={`${pIdx}-li-${i}`}
             className="flex items-start gap-3 text-sm text-gray-700 dark:text-[#AAA] leading-relaxed"
           >
-            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-[#444] flex-shrink-0" />
+            <span className="mt-[0.45rem] w-1.5 h-1.5 rounded-full bg-gray-300 dark:text-[#555] dark:bg-[#444] shrink-0" />
             <span>{processInline(line.trim().slice(2))}</span>
           </li>
         ));
 
       elements.push(
-        <ul key={`p-${pIdx}`} className="space-y-2 my-3">
+        <ul key={`p-${pIdx}`} className="space-y-2 my-4 policy-prose">
           {listItems}
         </ul>
       );
@@ -64,7 +60,7 @@ function processContent(content: string): ReactNode[] {
       elements.push(
         <p
           key={`p-${pIdx}`}
-          className="text-sm text-gray-700 dark:text-[#AAA] leading-relaxed mb-4 last:mb-0"
+          className="text-sm text-gray-700 dark:text-[#AAA] leading-relaxed mb-4 last:mb-0 policy-prose"
         >
           {processInline(trimmed)}
         </p>
@@ -77,7 +73,7 @@ function processContent(content: string): ReactNode[] {
 
 /**
  * Process inline formatting within a text string.
- * Returns an array of React nodes (strings and elements).
+ * Returns mixed array of strings and React nodes.
  */
 function processInline(text: string): ReactNode[] {
   const nodes: ReactNode[] = [];
@@ -85,7 +81,6 @@ function processInline(text: string): ReactNode[] {
   let keyCounter = 0;
 
   while (remaining.length > 0) {
-    // Find the earliest match among our patterns
     const patterns: Array<{
       regex: RegExp;
       handler: (match: RegExpExecArray) => ReactNode;
@@ -99,14 +94,14 @@ function processInline(text: string): ReactNode[] {
       },
       {
         // (Doc. N) → Link
-        regex: /\(Doc\.\s*(\d+)\)/,
+        regex: /\(Doc\.?\s*(\d+)\)/,
         handler: (match) => {
           const docNum = parseInt(match[1], 10);
           return (
             <Link
               key={`docref-${keyCounter++}`}
               href={getPolicyPath(docNum)}
-              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              className="policy-cross-ref text-gray-700 dark:text-[#AAA]"
             >
               Doc.&nbsp;{docNum}
             </Link>
@@ -141,16 +136,12 @@ function processInline(text: string): ReactNode[] {
     }
 
     if (earliestMatch && earliestHandler) {
-      // Push text before the match
       if (earliestIndex > 0) {
         nodes.push(remaining.slice(0, earliestIndex));
       }
-      // Push the matched element
       nodes.push(earliestHandler(earliestMatch));
-      // Continue with the rest
       remaining = remaining.slice(earliestIndex + earliestMatch[0].length);
     } else {
-      // No more matches — push remaining text and break
       nodes.push(remaining);
       break;
     }
@@ -173,18 +164,31 @@ export const PolicySectionBlock: React.FC<PolicySectionProps> = ({
   return (
     <section
       id={anchorId}
-      className="scroll-mt-24 mb-10 pl-6 border-l-2 border-gray-200 dark:border-[#222]
-        hover:border-gray-400 dark:hover:border-[#444] transition-colors duration-200"
+      className="scroll-mt-28 mb-10 pb-10 border-b border-gray-100 dark:border-[#111] last:border-0"
     >
-      <h2
-        className="text-xl font-semibold text-black dark:text-white mb-4"
-      >
+      {/* Section heading with copy-link anchor */}
+      <h2 className="text-lg font-semibold text-black dark:text-white mb-5 flex items-baseline gap-2 group/heading">
         <a
           href={`#${anchorId}`}
-          className="hover:underline decoration-gray-300 dark:decoration-[#444] underline-offset-4"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
+            window.history.replaceState(null, '', `#${anchorId}`);
+          }}
+          className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-150 decoration-gray-300 dark:decoration-[#333]"
         >
           {heading}
         </a>
+        <span
+          aria-hidden="true"
+          className="text-gray-300 dark:text-[#333] text-sm font-mono opacity-0 group-hover/heading:opacity-100 transition-opacity duration-150 cursor-pointer select-none"
+          onClick={() => {
+            navigator.clipboard?.writeText(window.location.origin + window.location.pathname + `#${anchorId}`);
+          }}
+          title="Copy link to section"
+        >
+          #
+        </span>
       </h2>
 
       <div>{processContent(content)}</div>

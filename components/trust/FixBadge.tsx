@@ -16,11 +16,11 @@ export const FixBadge: React.FC<FixBadgeProps> = ({ text }) => {
 
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-        bg-amber-100 dark:bg-amber-900/30
-        text-amber-800 dark:text-amber-300
-        border border-amber-200 dark:border-amber-800/50
-        text-[10px] font-mono uppercase tracking-wider
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded
+        bg-black dark:bg-white
+        text-white dark:text-black
+        border border-transparent
+        text-[10px] font-mono uppercase tracking-widest font-semibold
         leading-tight whitespace-nowrap align-middle"
     >
       <span className="text-[11px]" aria-hidden="true">⟳</span>

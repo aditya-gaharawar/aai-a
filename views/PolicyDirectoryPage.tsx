@@ -1,13 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { PolicyData, PolicyCategory } from '../lib/policyTypes';
 import { categories } from '../constants/policies/categories';
 import { getPolicyPath } from '../constants/policies/slugs';
 import FixBadge from '../components/trust/FixBadge';
+import { SearchIcon, ArrowRightIcon } from '../components/icons';
 
-// ─────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────
+// ─── TYPES ────────────────────────────────────────────
 
 interface PolicyDirectoryPageProps {
   policies: PolicyData[];
@@ -19,13 +19,46 @@ interface PolicyDirectoryPageProps {
   }>;
 }
 
-// ─────────────────────────────────────────────────
-// COMPONENT
-// ─────────────────────────────────────────────────
+// ─── COMPONENT ────────────────────────────────────────
 
 const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, appendixIndex }) => {
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState<PolicyCategory | 'All'>('All');
+  const router = useRouter();
+
+  // Initialise from URL query params
+  const initialSearch = (router.query.q as string) || '';
+  const initialCat = (router.query.cat as string) || 'All';
+
+  const [search, setSearch] = useState(initialSearch);
+  const [activeCategory, setActiveCategory] = useState<PolicyCategory | 'All'>(
+    initialCat as PolicyCategory | 'All'
+  );
+
+  // Sync URL params → state when router is ready
+  useEffect(() => {
+    if (!router.isReady) return;
+    const q = (router.query.q as string) || '';
+    const cat = (router.query.cat as string) || 'All';
+    setSearch(q);
+    setActiveCategory(cat as PolicyCategory | 'All');
+  }, [router.isReady, router.query.q, router.query.cat]);
+
+  // Update URL when filters change
+  const updateUrl = (q: string, cat: PolicyCategory | 'All') => {
+    const params: Record<string, string> = {};
+    if (q) params.q = q;
+    if (cat !== 'All') params.cat = cat;
+    router.replace({ pathname: '/trust/policies', query: params }, undefined, { shallow: true });
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    updateUrl(value, activeCategory);
+  };
+
+  const handleCategory = (cat: PolicyCategory | 'All') => {
+    setActiveCategory(cat);
+    updateUrl(search, cat);
+  };
 
   const filteredPolicies = useMemo(() => {
     let result = policies.filter((p) => p.number !== 34);
@@ -37,7 +70,11 @@ const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, app
       result = result.filter(
         (p) =>
           p.title.toLowerCase().includes(q) ||
-          String(p.number).includes(q)
+          String(p.number).includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          p.sections.some(
+            (s) => s.heading.toLowerCase().includes(q) || s.content.toLowerCase().slice(0, 400).includes(q)
+          )
       );
     }
     return result;
@@ -59,98 +96,164 @@ const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, app
     ...categories.map((c) => c.name),
   ];
 
+  const totalVisible = filteredPolicies.length;
+  const totalAll = policies.filter((p) => p.number !== 34).length;
+  const isFiltered = search.trim() || activeCategory !== 'All';
+
   return (
-    <main className="min-h-screen bg-white dark:bg-[#050505] relative overflow-hidden font-sans text-gray-900 dark:text-[#EDEDED] selection:bg-black/10 dark:selection:bg-white/20 pt-24 pb-32 transition-colors duration-300">
+    <main
+      className="min-h-screen bg-white dark:bg-[#050505] relative
+        font-sans text-gray-900 dark:text-[#EDEDED]
+        selection:bg-black/10 dark:selection:bg-white/20
+        pt-24 pb-32 transition-colors duration-300"
+    >
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 xl:px-24 relative z-10">
 
-        {/* ── HEADER ── */}
-        <div className="mb-16 text-center flex flex-col items-center">
+        {/* ── HEADER ─────────────────────────────────────────── */}
+        <div className="mb-12 flex flex-col items-start">
           <Link
             href="/trust"
-            className="text-xs font-mono text-gray-500 dark:text-[#555] uppercase tracking-widest mb-6 hover:text-gray-900 dark:hover:text-[#EDEDED] transition-colors duration-200"
+            className="text-xs font-mono text-gray-500 dark:text-[#555] uppercase tracking-widest mb-6
+              hover:text-gray-900 dark:hover:text-[#EDEDED] transition-colors duration-200
+              inline-flex items-center gap-1.5"
           >
-            ← Trust Center
+            <span aria-hidden="true">←</span> Trust Center
           </Link>
-          <h1 className="text-4xl md:text-6xl font-semibold tracking-tighter text-black dark:text-white mb-6 leading-tight max-w-[800px]">
+          <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter text-black dark:text-white mb-4 leading-tight">
             Policy Directory
           </h1>
-          <p className="text-gray-600 dark:text-[#888] text-lg md:text-xl leading-relaxed max-w-[700px]">
-            Browse the complete WEBSPACEAI policy suite. Search by title, filter by category, or navigate the cross-reference index.
+          <p className="text-gray-600 dark:text-[#888] text-base leading-relaxed max-w-[640px]">
+            All {totalAll} WEBSPACEAI policies — searchable by title, content, and category.
           </p>
         </div>
 
-        {/* ── SEARCH & FILTERS ── */}
-        <div className="mb-12">
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#555]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
+        {/* ── SEARCH & FILTERS ────────────────────────────────── */}
+        <div className="mb-10 space-y-4">
+
+          {/* Search input */}
+          <div className="relative max-w-xl">
+            <label htmlFor="policy-search" className="sr-only">Search policies</label>
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-[#555] pointer-events-none" />
+            <input
+              id="policy-search"
+              type="search"
+              placeholder="Search by title, content, or number…"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              autoComplete="off"
+              className="w-full pl-11 pr-10 py-3
+                bg-white dark:bg-[#0A0A0A]
+                border border-gray-200 dark:border-[#2a2a2a] rounded-xl
+                text-sm text-gray-900 dark:text-[#EDEDED]
+                placeholder-gray-400 dark:placeholder-[#555]
+                focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white
+                shadow-sm transition-colors duration-200"
+            />
+            {search && (
+              <button
+                onClick={() => handleSearch('')}
+                aria-label="Clear search"
+                className="absolute right-4 top-1/2 -translate-y-1/2
+                  text-gray-400 dark:text-[#555] hover:text-gray-700 dark:hover:text-[#EDEDED]
+                  transition-colors text-lg leading-none"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search policies by title or number…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-[#0A0A0A] border border-gray-200 dark:border-[#222] rounded-xl text-sm text-gray-900 dark:text-[#EDEDED] placeholder-gray-400 dark:placeholder-[#555] focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-[#333] transition-colors duration-200"
-              />
-            </div>
+                ×
+              </button>
+            )}
           </div>
-          <div className="flex flex-wrap gap-2">
+
+          {/* Category filters */}
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
             {categoryNames.map((cat) => {
               const isActive = activeCategory === cat;
+              const count = cat === 'All'
+                ? totalAll
+                : (policies.filter((p) => p.number !== 34 && p.category === cat).length);
               return (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                  onClick={() => handleCategory(cat)}
+                  aria-pressed={isActive}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 border
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white ${
                     isActive
-                      ? 'text-black dark:text-[#EDEDED] bg-white dark:bg-[#1a1a1a] border-gray-300 dark:border-[#444] shadow-sm'
-                      : 'text-gray-500 dark:text-[#666] bg-transparent border-transparent hover:text-gray-900 dark:hover:text-[#AAA] hover:bg-gray-100 dark:hover:bg-[#111]'
+                      ? 'text-black dark:text-white bg-white dark:bg-[#0A0A0A] border-gray-300 dark:border-[#444] shadow-sm'
+                      : 'text-gray-500 dark:text-[#888] bg-transparent border-transparent hover:text-black dark:hover:text-white hover:border-gray-200 dark:hover:border-[#333]'
                   }`}
                 >
-                  {cat}
+                  {cat === 'All' ? 'All' : cat.split(' ')[0]}
+                  <span className={`ml-1.5 font-mono text-[10px] ${isActive ? 'text-gray-500 dark:text-[#888]' : 'text-gray-400 dark:text-[#555]'}`}>
+                    {count}
+                  </span>
                 </button>
               );
             })}
           </div>
+
+          {/* Result count */}
+          {isFiltered && (
+            <p className="text-xs text-gray-500 dark:text-[#555]">
+              Showing <span className="font-semibold text-gray-700 dark:text-[#AAA]">{totalVisible}</span> of {totalAll} policies
+              {search && <> matching <span className="font-semibold">"{search}"</span></>}
+            </p>
+          )}
         </div>
 
-        {/* ── POLICY LISTING ── */}
-        <div className="mb-40">
+        {/* ── POLICY LISTING ─────────────────────────────────── */}
+        <div className="mb-24">
           {Object.keys(groupedPolicies).length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500 dark:text-[#555] text-sm">No policies match your search.</p>
+            /* Empty State */
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="text-5xl font-black text-gray-100 dark:text-[#111] mb-6 select-none" aria-hidden="true">
+                ?
+              </div>
+              <p className="text-base font-medium text-gray-900 dark:text-[#EDEDED] mb-2">
+                No policies found
+              </p>
+              <p className="text-sm text-gray-500 dark:text-[#666] mb-6 max-w-xs">
+                Try a different search term or clear the category filter to see all documents.
+              </p>
+              <button
+                onClick={() => { handleSearch(''); handleCategory('All'); }}
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-[#333]
+                  bg-white dark:bg-[#0A0A0A] text-sm font-medium
+                  text-gray-700 dark:text-[#EDEDED]
+                  hover:border-gray-400 dark:hover:border-[#555]
+                  transition-colors duration-200"
+              >
+                Clear all filters
+              </button>
             </div>
           ) : (
             Object.entries(groupedPolicies).map(([categoryName, catPolicies]) => (
-              <div key={categoryName} className="mb-16 last:mb-0">
-                <h3 className="text-xs font-mono text-gray-500 dark:text-[#555] uppercase tracking-widest mb-6">
-                  {categoryName}
-                </h3>
+              <div key={categoryName} className="mb-14 last:mb-0">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-xs font-mono text-gray-500 dark:text-[#555] uppercase tracking-widest">
+                    {categoryName}
+                  </h2>
+                  <span className="text-xs font-mono text-gray-400 dark:text-[#555]">
+                    {catPolicies.length} doc{catPolicies.length !== 1 ? 's' : ''}
+                  </span>
+                </div>
 
-                {/* Desktop: Table layout */}
-                <div className="hidden md:block border border-gray-200 dark:border-[#222] rounded-2xl bg-gray-50 dark:bg-[#0A0A0A] overflow-hidden transition-colors duration-300">
+                {/* Desktop: Table */}
+                <div className="hidden md:block border border-gray-200 dark:border-[#222] rounded-2xl bg-white dark:bg-[#0A0A0A] overflow-hidden shadow-sm">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-[#222]">
-                        <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4 w-16">Doc</th>
-                        <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4">Title</th>
-                        <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4 w-20">Version</th>
-                        <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4 w-24">Status</th>
-                        <th className="px-6 py-4 w-12"></th>
+                      <tr className="border-b border-gray-200 dark:border-[#1a1a1a]">
+                        <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5 w-16">Doc</th>
+                        <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5">Title</th>
+                        <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5 w-24">Version</th>
+                        <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5 w-28">Status</th>
+                        <th scope="col" className="px-6 py-3.5 w-10"><span className="sr-only">Open</span></th>
                       </tr>
                     </thead>
                     <tbody>
                       {catPolicies.map((policy) => (
                         <tr
                           key={policy.number}
-                          className="border-b border-gray-200 dark:border-[#222] last:border-0 hover:bg-gray-100 dark:hover:bg-[#111] transition-colors duration-200"
+                          className="border-b border-gray-100 dark:border-[#1a1a1a] last:border-0
+                            hover:bg-gray-50 dark:hover:bg-[#111] transition-colors duration-150 group"
                         >
                           <td className="px-6 py-4 text-sm font-mono text-gray-400 dark:text-[#555]">
                             {String(policy.number).padStart(2, '0')}
@@ -158,7 +261,9 @@ const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, app
                           <td className="px-6 py-4">
                             <Link
                               href={getPolicyPath(policy.number)}
-                              className="text-sm font-medium text-gray-900 dark:text-[#EDEDED] hover:text-black dark:hover:text-white transition-colors duration-200"
+                              className="text-sm font-medium text-gray-900 dark:text-[#EDEDED]
+                                hover:text-black dark:hover:text-white transition-colors duration-150
+                                focus-visible:underline"
                             >
                               {policy.title}
                             </Link>
@@ -172,9 +277,13 @@ const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, app
                           <td className="px-6 py-4 text-right">
                             <Link
                               href={getPolicyPath(policy.number)}
-                              className="text-gray-400 dark:text-[#555] hover:text-gray-900 dark:hover:text-[#EDEDED] transition-colors duration-200"
+                              aria-label={`Open ${policy.title}`}
+                              className="text-gray-300 dark:text-[#444]
+                                hover:text-gray-700 dark:hover:text-[#888]
+                                group-hover:text-gray-600 dark:group-hover:text-[#666]
+                                transition-colors duration-150 inline-flex items-center"
                             >
-                              →
+                              <ArrowRightIcon className="w-4 h-4" />
                             </Link>
                           </td>
                         </tr>
@@ -183,30 +292,34 @@ const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, app
                   </table>
                 </div>
 
-                {/* Mobile: Card layout */}
-                <div className="md:hidden space-y-3">
+                {/* Mobile: Cards */}
+                <div className="md:hidden space-y-2.5">
                   {catPolicies.map((policy) => (
                     <Link
                       key={policy.number}
                       href={getPolicyPath(policy.number)}
-                      className="block border border-gray-200 dark:border-[#222] rounded-xl bg-gray-50 dark:bg-[#0A0A0A] p-5 hover:bg-gray-100 dark:hover:bg-[#111] transition-colors duration-200"
+                      className="flex items-center gap-4 p-4
+                        border border-gray-200 dark:border-[#222] rounded-xl
+                        bg-white dark:bg-[#0A0A0A]
+                        hover:border-gray-400 dark:hover:border-[#444]
+                        shadow-sm transition-all duration-200 group"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-mono text-gray-400 dark:text-[#555]">
-                              Doc {String(policy.number).padStart(2, '0')}
-                            </span>
-                            {policy.isNew && <FixBadge text="New" />}
-                          </div>
-                          <h4 className="text-sm font-medium text-gray-900 dark:text-[#EDEDED] truncate">
+                      <span className="text-xs font-mono text-gray-400 dark:text-[#555] shrink-0 w-7">
+                        {String(policy.number).padStart(2, '0')}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-sm font-medium text-gray-900 dark:text-[#EDEDED] truncate
+                            group-hover:text-black dark:group-hover:text-white transition-colors">
                             {policy.title}
-                          </h4>
+                          </p>
+                          {policy.isNew && <FixBadge text="New" />}
                         </div>
-                        <span className="text-xs font-mono text-gray-400 dark:text-[#555] mt-1">
-                          v{policy.version}
-                        </span>
+                        <p className="text-xs font-mono text-gray-400 dark:text-[#555]">v{policy.version}</p>
                       </div>
+                      <ArrowRightIcon className="w-3.5 h-3.5 text-gray-300 dark:text-[#444]
+                        group-hover:text-gray-600 dark:group-hover:text-[#666]
+                        transition-colors shrink-0" />
                     </Link>
                   ))}
                 </div>
@@ -215,64 +328,58 @@ const PolicyDirectoryPage: React.FC<PolicyDirectoryPageProps> = ({ policies, app
           )}
         </div>
 
-        {/* ── APPENDIX: CROSS-REFERENCE INDEX ── */}
-        {appendixIndex.length > 0 && (
-          <div className="mb-32">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl font-semibold tracking-tight text-black dark:text-white mb-4">
-                Cross-Reference Index
+        {/* ── CROSS-REFERENCE INDEX ──────────────────────────── */}
+        {appendixIndex.length > 0 && !search && activeCategory === 'All' && (
+          <div className="mb-24">
+            <div className="mb-10">
+              <h2 className="text-xl font-semibold tracking-tight text-black dark:text-white mb-2">
+                Cross-reference index
               </h2>
-              <p className="text-gray-600 dark:text-[#888] text-base max-w-[600px] mx-auto">
-                Risk-level mappings and cross-references between all policy documents.
+              <p className="text-sm text-gray-600 dark:text-[#888]">
+                Risk-level mappings and cross-references across all policy documents.
               </p>
             </div>
 
-            <div className="border border-gray-200 dark:border-[#222] rounded-2xl bg-gray-50 dark:bg-[#0A0A0A] overflow-x-auto transition-colors duration-300">
-              <table className="w-full min-w-[640px]">
-                <thead>
-                  <tr className="border-b border-gray-200 dark:border-[#222]">
-                    <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4">
-                      Policy
-                    </th>
-                    <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4">
-                      Risk Levels
-                    </th>
-                    <th className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-4">
-                      Key Cross-Refs
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {appendixIndex.map((entry, idx) => (
-                    <tr
-                      key={idx}
-                      className="border-b border-gray-200 dark:border-[#222] last:border-0 hover:bg-gray-100 dark:hover:bg-[#111] transition-colors duration-200"
-                    >
-                      <td className="px-6 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-900 dark:text-[#EDEDED]">{entry.policy}</span>
-                          {entry.isNew && <FixBadge text="New" />}
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 text-sm text-gray-600 dark:text-[#888]">
-                        {entry.riskLevels}
-                      </td>
-                      <td className="px-6 py-3 text-sm text-gray-600 dark:text-[#888] font-mono">
-                        {entry.keyCrossRefs}
-                      </td>
+            <div className="border border-gray-200 dark:border-[#222] rounded-2xl bg-white dark:bg-[#0A0A0A] overflow-hidden shadow-sm">
+              <div className="table-responsive">
+                <table className="w-full min-w-[640px]">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-[#1a1a1a]">
+                      <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5">Policy</th>
+                      <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5">Risk Levels</th>
+                      <th scope="col" className="text-left text-[11px] font-mono uppercase tracking-widest text-gray-400 dark:text-[#555] px-6 py-3.5">Key Cross-refs</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {appendixIndex.map((entry, idx) => (
+                      <tr
+                        key={idx}
+                        className="border-b border-gray-100 dark:border-[#1a1a1a] last:border-0
+                          hover:bg-gray-50 dark:hover:bg-[#111] transition-colors duration-150"
+                      >
+                        <td className="px-6 py-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-900 dark:text-[#EDEDED]">{entry.policy}</span>
+                            {entry.isNew && <FixBadge text="New" />}
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 text-sm text-gray-600 dark:text-[#888]">{entry.riskLevels}</td>
+                        <td className="px-6 py-3 text-sm text-gray-600 dark:text-[#888] font-mono">{entry.keyCrossRefs}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ── END MARKER ── */}
-        <div className="mt-20 pt-8 pb-12 text-center text-gray-400 dark:text-[#444] text-[11px] font-mono uppercase tracking-widest flex flex-col items-center justify-center gap-3 border-t border-gray-200 dark:border-[#111]">
-          <div className="flex items-center gap-2">
-            <span>■</span> End of Policy Directory
-          </div>
+        {/* ── END MARKER ────────────────────────────────────── */}
+        <div className="pt-8 pb-4 text-center text-gray-400 dark:text-[#333]
+          text-[11px] font-mono uppercase tracking-widest
+          flex items-center justify-center gap-2
+          border-t border-gray-100 dark:border-[#111]">
+          <span aria-hidden="true">■</span> End of Policy Directory
         </div>
 
       </div>

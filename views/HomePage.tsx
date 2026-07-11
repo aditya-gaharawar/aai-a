@@ -15,7 +15,7 @@ const HorizontalSection: React.FC<{ title: string; cards: CardData[] }> = ({ tit
     <section className="py-12">
         <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
-            <Link href="#" className="text-sm font-semibold text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white flex items-center gap-1 transition-colors group">
+            <Link href="/soon" className="text-sm font-semibold text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white flex items-center gap-1 transition-colors group">
                 <span>View all</span>
                 <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -33,7 +33,7 @@ const HorizontalSection: React.FC<{ title: string; cards: CardData[] }> = ({ tit
 
 const HomePage: React.FC = () => {
   return (
-    <main className="px-4 md:px-8 lg:px-12 xl:px-24">
+    <main className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 xl:px-24 w-full">
       <Hero />
       <HorizontalSection title="Product" cards={productCards} />
       <HorizontalSection title="Research" cards={researchCards} />

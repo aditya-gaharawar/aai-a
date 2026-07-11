@@ -60,7 +60,7 @@ const SafetyPage: React.FC = () => {
 
     return (
         <main className="min-h-screen bg-white dark:bg-[#050505] relative overflow-hidden font-sans text-gray-900 dark:text-[#EDEDED] selection:bg-black/10 dark:selection:bg-white/20 pt-24 pb-32 transition-colors duration-300">
-            <div className="max-w-screen-lg mx-auto px-6 md:px-12 relative z-10">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 xl:px-24 relative z-10">
                 
                 {/* ── SECTION A: HERO ── */}
                 <div className="mb-32 text-center flex flex-col items-center">

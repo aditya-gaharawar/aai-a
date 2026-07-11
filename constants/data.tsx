@@ -5,194 +5,199 @@ import image4 from '../src/assets/images/image4.jpeg';
 
 export const heroSlides = [
   {
-    title: 'Spring Update',
-    description: 'Introducing GPT-4o and making more capabilities available for free in our Product.',
-    imageUrl: 'https://picsum.photos/seed/spring-update/1400/800',
-    buttonText: 'Learn more',
-  },
-  {
     title: 'Explore Our Research',
-    description: 'Advancing AI to benefit all of humanity.',
-    imageUrl: 'https://picsum.photos/seed/research/1400/800',
-    buttonText: 'See publications',
+    description: 'Advancing AI to benefit all of humanity—safely, transparently, and with lasting purpose.',
+    imageUrl: geminiGenerated.src,
+    buttonText: 'See our research',
+    href: '/safety',
   },
   {
-    title: 'AI for Business',
-    description: 'Deploy the world\'s most capable models in your own applications.',
-    imageUrl: 'https://picsum.photos/seed/business/1400/800',
-    buttonText: 'Discover our APIs',
+    title: 'AI for Everyone',
+    description: 'Deploy the world\'s most thoughtfully built AI models in your own applications.',
+    imageUrl: image4.src,
+    buttonText: 'Explore products',
+    href: '/soon',
   },
   {
-    title: 'Join Our Team',
-    description: 'Help us build the future of artificial intelligence.',
-    imageUrl: 'https://picsum.photos/seed/team/1200/600',
+    title: 'Trust by Design',
+    description: 'Transparency, governance, and safety are foundational to everything we build.',
+    imageUrl: 'https://picsum.photos/seed/trust-ai/1400/800',
+    buttonText: 'Visit Trust Center',
+    href: '/trust',
+  },
+  {
+    title: 'Join Our Mission',
+    description: 'We\'re building the future of responsible artificial intelligence. Come build it with us.',
+    imageUrl: 'https://picsum.photos/seed/webspaceai-team/1200/600',
     buttonText: 'View careers',
+    href: '/soon',
   },
 ];
 
 export const productCards: CardData[] = [
   {
     category: 'For Everyone',
-    title: 'WEBSPACEAI',
+    title: 'WEBSPACEAI Assistant',
     imageUrl: geminiGenerated.src,
   },
   {
-    category: 'For Everyone',
-    title: 'ONE',
+    category: 'For Teams',
+    title: 'WEBSPACEAI ONE',
     imageUrl: image4.src,
   },
 ];
 
 export const researchCards: CardData[] = [
   {
-    category: 'GPT-4o',
-    date: 'May 13, 2024',
-    title: 'Hello GPT-4o',
-    imageUrl: 'https://picsum.photos/seed/gpt4o/600/800',
+    category: 'AI Safety',
+    date: 'Jun 2026',
+    title: 'Scalable oversight for large language models',
+    imageUrl: 'https://picsum.photos/seed/safety_research_2026/600/800',
   },
   {
-    category: 'Sora',
-    title: 'Video generation models as world simulators',
-    imageUrl: 'https://picsum.photos/seed/sora/600/800',
+    category: 'Alignment',
+    date: 'Apr 2026',
+    title: 'Constitutional AI: Harmlessness from AI feedback',
+    imageUrl: 'https://picsum.photos/seed/alignment_research/600/800',
   },
   {
-    category: 'Safety',
-    date: 'Dec 18, 2023',
-    title: 'Weak-to-strong generalization in LLMs',
-    imageUrl: 'https://picsum.photos/seed/safety_research/600/800',
+    category: 'Interpretability',
+    date: 'Feb 2026',
+    title: 'Mechanistic interpretability of transformer circuits',
+    imageUrl: 'https://picsum.photos/seed/interpretability/600/800',
   },
   {
     category: 'Multi-modal',
-    date: 'Oct 25, 2023',
-    title: 'Unified reasoning across text and vision',
-    imageUrl: 'https://picsum.photos/seed/multimodal/600/800',
+    date: 'Jan 2026',
+    title: 'Unified reasoning across text, vision, and audio',
+    imageUrl: 'https://picsum.photos/seed/multimodal_2026/600/800',
   },
 ];
 
 export const newsCards: CardData[] = [
   {
     category: 'Company',
-    date: 'Jun 10, 2024',
-    title: 'WEBSPACEAI and Apple announce partnership',
-    imageUrl: 'https://picsum.photos/seed/apple/600/600',
+    date: 'Jul 4, 2026',
+    title: 'WEBSPACEAI Policy Suite v2.1 — 40 documents, fully cross-referenced',
+    imageUrl: 'https://picsum.photos/seed/policy_suite/600/600',
   },
   {
-    category: 'Company',
-    date: 'May 8, 2024',
-    title: 'Introducing the Model Spec',
-    imageUrl: 'https://picsum.photos/seed/modelspec/600/600',
+    category: 'Research',
+    date: 'Jun 15, 2026',
+    title: 'Introducing our AI Safety Framework: five levels of capability-aligned safeguards',
+    imageUrl: 'https://picsum.photos/seed/safety_framework/600/600',
   },
 ];
 
 export const menuLinks: FooterLinkColumn[] = [
-    {
-        title: "Research",
-        links: [
-            { text: "Overview", href: "#" },
-            { text: "Index", href: "#" },
-            { text: "GPT-4o", href: "#" },
-            { text: "Sora", href: "#" },
-        ],
-    },
-    {
-        title: "Products",
-        links: [
-            { text: "Our Product", href: "#" },
-            { text: "API", href: "#" },
-            { text: "Pricing", href: "#" },
-            { text: "For Business", href: "#" },
-        ],
-    },
-    {
-        title: "Company",
-        links: [
-            { text: "About us", href: "#" },
-            { text: "News", href: "#" },
-            { text: "Careers", href: "#" },
-            { text: "Security", href: "/trust/policies/11-security-policy" },
-        ],
-    },
-    {
-      title: "Safety",
-      links: [
-          { text: "Safety Framework", href: "/safety" },
-          { text: "Trust Center", href: "/trust" },
-          { text: "All Policies", href: "/trust/policies" },
-      ],
-  }
+  {
+    title: 'Research',
+    links: [
+      { text: 'Overview', href: '/soon' },
+      { text: 'Publications', href: '/soon' },
+      { text: 'AI Safety', href: '/safety' },
+      { text: 'Interpretability', href: '/soon' },
+    ],
+  },
+  {
+    title: 'Products',
+    links: [
+      { text: 'WEBSPACEAI', href: '/soon' },
+      { text: 'API Platform', href: '/soon' },
+      { text: 'Pricing', href: '/soon' },
+      { text: 'For Business', href: '/soon' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { text: 'About us', href: '/soon' },
+      { text: 'News', href: '/soon' },
+      { text: 'Careers', href: '/soon' },
+      { text: 'Security', href: '/trust/policies/11-security-policy' },
+    ],
+  },
+  {
+    title: 'Trust & Safety',
+    links: [
+      { text: 'Safety Framework', href: '/safety' },
+      { text: 'Trust Center', href: '/trust' },
+      { text: 'All Policies', href: '/trust/policies' },
+      { text: 'Privacy Policy', href: '/trust/policies/01-privacy-policy' },
+    ],
+  },
 ];
 
 export const footerLinks: FooterLinkColumn[] = [
-    {
-        title: "Research",
-        links: [
-            { text: "Overview", href: "#" },
-            { text: "Index", href: "#" },
-            { text: "Latest advancements", href: "#" },
-            { text: "GPT-4", href: "#" },
-            { text: "DALL·E 3", href: "#" },
-            { text: "Sora", href: "#" },
-        ],
-    },
-    {
-        title: "Product",
-        links: [
-            { text: "For Everyone", href: "#" },
-            { text: "For Teams", href: "#" },
-            { text: "For Enterprises", href: "#" },
-            { text: "Product login", href: "#", external: true },
-        ],
-    },
-    {
-        title: "API",
-        links: [
-            { text: "Platform overview", href: "#" },
-            { text: "Pricing", href: "#" },
-            { text: "Documentation", href: "#", external: true },
-            { text: "API login", href: "#", external: true },
-        ],
-    },
-    {
-        title: "Explore more",
-        links: [
-            { text: "WEBSPACEAI for business", href: "#" },
-            { text: "Stories", href: "#" },
-        ],
-    },
-    {
-        title: "Safety",
-        links: [
-            { text: "Safety Framework", href: "/safety" },
-            { text: "Trust Center", href: "/trust" },
-            { text: "All Policies", href: "/trust/policies" },
-        ],
-    },
-    {
-        title: "Teams",
-        links: [
-            { text: "Safety Systems", href: "#" },
-            { text: "Preparedness", href: "#" },
-            { text: "Superalignment", href: "#" },
-        ],
-    },
-    {
-        title: "Company",
-        links: [
-            { text: "About us", href: "#" },
-            { text: "News", href: "#" },
-            { text: "Our Charter", href: "#" },
-            { text: "Security", href: "/trust/policies/11-security-policy" },
-            { text: "Residency", href: "#" },
-            { text: "Careers", href: "#" },
-        ],
-    },
-    {
-        title: "Terms & policies",
-        links: [
-            { text: "Terms of use", href: "/trust/policies/02-terms-of-service" },
-            { text: "Privacy policy", href: "/trust/policies/01-privacy-policy" },
-            { text: "Trust Center", href: "/trust" },
-            { text: "All policies", href: "/trust/policies" },
-        ],
-    },
+  {
+    title: 'Research',
+    links: [
+      { text: 'Overview', href: '/soon' },
+      { text: 'Publications', href: '/soon' },
+      { text: 'AI Safety', href: '/safety' },
+      { text: 'Interpretability', href: '/soon' },
+      { text: 'Alignment', href: '/soon' },
+    ],
+  },
+  {
+    title: 'Product',
+    links: [
+      { text: 'For Everyone', href: '/soon' },
+      { text: 'For Teams', href: '/soon' },
+      { text: 'For Enterprise', href: '/soon' },
+      { text: 'Product login', href: '/soon', external: true },
+    ],
+  },
+  {
+    title: 'API',
+    links: [
+      { text: 'Platform overview', href: '/soon' },
+      { text: 'Pricing', href: '/soon' },
+      { text: 'Documentation', href: '/soon', external: true },
+      { text: 'API login', href: '/soon', external: true },
+    ],
+  },
+  {
+    title: 'Explore',
+    links: [
+      { text: 'For business', href: '/soon' },
+      { text: 'Stories', href: '/soon' },
+      { text: 'Partnerships', href: '/soon' },
+    ],
+  },
+  {
+    title: 'Trust & Safety',
+    links: [
+      { text: 'Safety Framework', href: '/safety' },
+      { text: 'Trust Center', href: '/trust' },
+      { text: 'All Policies', href: '/trust/policies' },
+    ],
+  },
+  {
+    title: 'Teams',
+    links: [
+      { text: 'Safety Systems', href: '/soon' },
+      { text: 'Preparedness', href: '/soon' },
+      { text: 'Alignment Research', href: '/soon' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { text: 'About us', href: '/soon' },
+      { text: 'News', href: '/soon' },
+      { text: 'Our Charter', href: '/soon' },
+      { text: 'Security', href: '/trust/policies/11-security-policy' },
+      { text: 'Careers', href: '/soon' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { text: 'Terms of use', href: '/trust/policies/02-terms-of-service' },
+      { text: 'Privacy policy', href: '/trust/policies/01-privacy-policy' },
+      { text: 'Cookie policy', href: '/trust/policies/04-cookie-policy' },
+      { text: 'All policies', href: '/trust/policies' },
+    ],
+  },
 ];

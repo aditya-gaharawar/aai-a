@@ -1,5 +1,24 @@
-node_modules
-dist
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
 *.tsbuildinfo
-vite.config.js
-vite.config.d.ts
+
+# local env files
+.env*.local
+
+# deployment hosting
+.vercel
+.netlify

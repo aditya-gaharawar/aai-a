@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { CloseIcon, ArrowRightIcon } from './icons';
 import { menuLinks } from '../constants/data';
 
@@ -92,10 +93,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
               <ul className="space-y-4">
                 {column.links.map((link) => (
                   <li key={link.text}>
-                    <a href={link.href} className="text-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors flex items-center group">
+                    <Link href={link.href} className="text-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors flex items-center group" onClick={onClose}>
                       <span>{link.text}</span>
                       <ArrowRightIcon className="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0" />
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
